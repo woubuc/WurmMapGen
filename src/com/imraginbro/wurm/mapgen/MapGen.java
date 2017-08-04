@@ -94,7 +94,7 @@ public class MapGen {
 
 		BufferedImage mapImage = new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_ARGB);
 
-		ExecutorService executor = Executors.newFixedThreadPool(10);
+		ExecutorService executor = Executors.newFixedThreadPool(2);
 		System.out.println("Starting multi-thread image generation");
 		
 		for (int y = 0; y < MAP_SIZE; y++) {
