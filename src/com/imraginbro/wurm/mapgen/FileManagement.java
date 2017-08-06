@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -29,7 +30,6 @@ public class FileManagement {
 	public static void relocateFileVars() {
 		MapGen.map_topLayer = new File(MapGen.saveLocation.getAbsolutePath() + separator + "tmp" + separator + MapGen.map_topLayer.getName());
 		MapGen.db_wurmZones = new File(MapGen.saveLocation.getAbsolutePath() + separator + "tmp" + separator + MapGen.db_wurmZones.getName());
-		MapGen.db_wurmItems = new File(MapGen.saveLocation.getAbsolutePath() + separator + "tmp" + separator + MapGen.db_wurmItems.getName());
 	}
 	
 	public static void saveToFile(BufferedImage newImg, File file) throws IOException {
@@ -64,6 +64,9 @@ public class FileManagement {
 	}
 	
 	public static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+		if (!MapGen.replaceFiles && new File(filePath).exists()) {
+			return;
+		}
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[4096];
         int read = 0;
@@ -137,6 +140,68 @@ public class FileManagement {
 	        }
 	    }
 	    file.delete();
+	}
+	
+	public static void copyPropertiesFile() {
+		try {
+			InputStream in = FileManagement.class.getResourceAsStream("/resources/WurmMapGen.properties");
+			copy(in, "WurmMapGen.properties");
+			in.close();
+		} catch(Exception e) {
+			System.out.println("Error copying properties file from jar - " + e.getMessage());
+		}
+	}
+	
+	public static boolean loadPropValues() {
+		System.out.println("Loading WurmMapGen.properties file!");
+		Properties prop = new Properties();
+		InputStream input = null;
+		try {
+			input = new FileInputStream("WurmMapGen.properties");
+		} catch (Exception e) {
+			System.out.println("[ERROR] problem loading properties FileInputStream - " + e.getMessage());
+			System.out.println("Copying properties file from jar... please configure and restart program.");
+			copyPropertiesFile();
+			return false;
+		}
+		if (input != null) {
+			try {
+				prop.load(input);
+			} catch (Exception e) {
+				System.out.println("Error loading properties file - " + e.getMessage());
+			}
+		}
+		
+		String maploc = prop.getProperty("wurmMapLocation", "C:/location/to/map/folder");
+		String saveloc = prop.getProperty("saveLocation", "C:/location/to/save/folder");
+		
+		System.out.println("[INFO] Map location: " + maploc);
+		System.out.println("[INFO] Save location: " + saveloc);
+		
+		if (maploc.equals("C:/location/to/map/folder") || saveloc.equals("C:/location/to/save/folder")) {
+			System.out.println("[ERROR] Looks like you are using the default map or save location. Please change in your config file.");
+			return false;
+		}
+		
+		MapGen.gen_map_shading = Boolean.parseBoolean(prop.getProperty("mapGenerateShading", Boolean.toString(MapGen.gen_map_shading)));
+		MapGen.gen_map_shade_paths = Boolean.parseBoolean(prop.getProperty("mapShadePaths", Boolean.toString(MapGen.gen_map_shade_paths)));
+		MapGen.gen_map_water = Boolean.parseBoolean(prop.getProperty("mapGenerateWater", Boolean.toString(MapGen.gen_map_water)));
+		MapGen.gen_map_bridges = Boolean.parseBoolean(prop.getProperty("mapGenerateBridges", Boolean.toString(MapGen.gen_map_bridges)));
+		
+		MapGen.wurmMapLocation = new File(maploc);
+		MapGen.saveLocation = new File(saveloc);
+		
+		MapGen.replaceFiles = Boolean.parseBoolean(prop.getProperty("replaceFiles", Boolean.toString(MapGen.replaceFiles)));
+		
+
+		if (input != null) {
+			try {
+				input.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
 	}
 	
 }

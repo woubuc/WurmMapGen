@@ -30,6 +30,10 @@ public class FileGeneration {
 	}
 
 	public static void generateDeedsFile(File saveLocation, File db_wurmZones) throws IOException, SQLException {
+		if (!db_wurmZones.exists()) {
+			System.out.println("[ERROR] Could not find zones.db. Skipping deed file generation.");
+			return;
+		}
 		System.out.println("Writing deeds.js file...");
 		BufferedWriter bw = new BufferedWriter(new FileWriter(saveLocation.getAbsolutePath() + separator + "deeds.js", false));
 		String deedBordersString = "";

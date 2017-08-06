@@ -21,42 +21,48 @@ import com.wurmonline.mesh.Tiles.Tile;
 
 public class MapGen {
 
-	final static String newLine = System.lineSeparator();
-	final static String separator = java.io.File.separator;
+	public final static String newLine = System.lineSeparator();
+	public final static String separator = java.io.File.separator;
 	
-	static int threadCounter = 0;
+	public static int threadCounter = 0;
 
-	static File wurmMapLocation = null;
-	static File saveLocation = null;
+	public static File map_topLayer = null;
+	public static File db_wurmZones = null;
 
-	static File map_topLayer = null;
-	static File db_wurmZones = null;
-	static File db_wurmItems = null;
-
-	static File[] fileBackupArray = new File[3];
+	public static File[] fileBackupArray = new File[2];
 
 	//vars for map gen
-	final static boolean gen_map_shading = true;
-	final static boolean gen_map_avoid_shading_paths = false;
-	final static boolean gen_map_water = true;
-	final static boolean gen_map_bridges = true;
+	public static boolean gen_map_shading = true;
+	public static boolean gen_map_shade_paths = true;
+	public static boolean gen_map_water = true;
+	public static boolean gen_map_bridges = true;
+	
+	//config settings
+	public static boolean replaceFiles = true;
+	public static File wurmMapLocation = null;
+	public static File saveLocation = null;
 
 	public static void main(String[] args) throws Exception {
-
-		wurmMapLocation = new File(args[0]);
-		saveLocation = new File(args[1]);
+		
+		if (!FileManagement.loadPropValues()) {
+			return;
+		}
 
 		if (wurmMapLocation == null || saveLocation == null) {
+			System.out.println("[ERROR] Wurm map location or save location was not set.");
 			return;
 		}
 
 		map_topLayer = new File(wurmMapLocation.getAbsolutePath() + separator + "top_layer.map");
 		db_wurmZones = new File(wurmMapLocation.getAbsolutePath() + separator + "sqlite" + separator + "wurmzones.db");
-		db_wurmItems = new File(wurmMapLocation.getAbsolutePath() + separator + "sqlite" + separator + "wurmitems.db");
+		
+		if (!map_topLayer.exists()) {
+			System.out.println("[ERROR] Could not find top_layer.map! Stopping program.");
+			return;
+		}
 
 		fileBackupArray[0] = map_topLayer;
 		fileBackupArray[1] = db_wurmZones;
-		fileBackupArray[2] = db_wurmItems;
 
 		final long startTime = System.currentTimeMillis();
 
@@ -66,15 +72,15 @@ public class MapGen {
 		System.out.println("Loading top_layer.map file...");
 		MeshIO map = MeshIO.open(map_topLayer.getAbsolutePath());
 
+		genImages(map);
+		map.close();
+		
 		FileManagement.extractRescources("/resources/required.zip", saveLocation);
 		FileGeneration.generateFiles(map);
 
-		genImages(map);
-		map.close();
-
 		System.out.println("Removing temporary files...");
 		FileManagement.deleteDir(new File(saveLocation.getAbsolutePath() + separator + "tmp"));
-
+		
 		final long endTime = System.currentTimeMillis();
 		final long totalTime = (endTime - startTime)/1000;
 		System.out.println("Finished with map generation! " + totalTime + " seconds.");
@@ -158,7 +164,7 @@ public class MapGen {
 			g_mapImage.fillRect(newX, newY, PIXEL_SIZE, PIXEL_SIZE);
 			if (gen_map_shading) {
 				boolean checkPath = false;
-				if (gen_map_avoid_shading_paths) {
+				if (!gen_map_shade_paths) {
 					final int[] path_tile_types = {
 							Tiles.TILE_TYPE_COBBLESTONE, Tiles.TILE_TYPE_COBBLESTONE_ROUND,
 							Tiles.TILE_TYPE_MARBLE_BRICKS, Tiles.TILE_TYPE_MARBLE_SLABS,
@@ -202,6 +208,10 @@ public class MapGen {
 
 	public static void drawBridges(BufferedImage mapImage, int PIXEL_SIZE) throws SQLException {
 		if (gen_map_bridges) {
+			if (!db_wurmZones.exists()) {
+				System.out.println("[ERROR] Could not find zones.db. Skipping bridge generation.");
+				return;
+			}
 			Graphics2D g_mapImage = mapImage.createGraphics();
 			System.out.println("Loading bridges from wurmzones.db...");
 			Tile thisTile = Tiles.getTile(9);
