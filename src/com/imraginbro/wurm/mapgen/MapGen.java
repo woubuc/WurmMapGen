@@ -28,14 +28,21 @@ public class MapGen {
 
 	public static File map_topLayer = null;
 	public static File db_wurmZones = null;
+	public static File db_wurmItems = null;
+	public static File db_wurmPlayers = null;
 
-	public static File[] fileBackupArray = new File[2];
+	public static File[] fileBackupArray = new File[4];
 
 	//vars for map gen
 	public static boolean gen_map_shading = true;
 	public static boolean gen_map_shade_paths = true;
 	public static boolean gen_map_water = true;
 	public static boolean gen_map_bridges = true;
+	
+	//marker generation
+	public static boolean showDeeds = true;
+	public static boolean showGuardTowers = true;
+	public static boolean showStructures = true;
 	
 	//config settings
 	public static boolean replaceFiles = true;
@@ -55,6 +62,8 @@ public class MapGen {
 
 		map_topLayer = new File(wurmMapLocation.getAbsolutePath() + separator + "top_layer.map");
 		db_wurmZones = new File(wurmMapLocation.getAbsolutePath() + separator + "sqlite" + separator + "wurmzones.db");
+		db_wurmItems = new File(wurmMapLocation.getAbsolutePath() + separator + "sqlite" + separator + "wurmitems.db");
+		db_wurmPlayers = new File(wurmMapLocation.getAbsolutePath() + separator + "sqlite" + separator + "wurmplayers.db");
 		
 		if (!map_topLayer.exists()) {
 			System.out.println("[ERROR] Could not find top_layer.map! Stopping program.");
@@ -63,6 +72,8 @@ public class MapGen {
 
 		fileBackupArray[0] = map_topLayer;
 		fileBackupArray[1] = db_wurmZones;
+		fileBackupArray[2] = db_wurmItems;
+		fileBackupArray[3] = db_wurmPlayers;
 
 		final long startTime = System.currentTimeMillis();
 
@@ -100,7 +111,7 @@ public class MapGen {
 
 		BufferedImage mapImage = new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_ARGB);
 
-		ExecutorService executor = Executors.newFixedThreadPool(2);
+		ExecutorService executor = Executors.newFixedThreadPool(5);
 		System.out.println("Starting multi-thread image generation");
 		
 		for (int y = 0; y < MAP_SIZE; y++) {

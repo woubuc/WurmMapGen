@@ -30,6 +30,8 @@ public class FileManagement {
 	public static void relocateFileVars() {
 		MapGen.map_topLayer = new File(MapGen.saveLocation.getAbsolutePath() + separator + "tmp" + separator + MapGen.map_topLayer.getName());
 		MapGen.db_wurmZones = new File(MapGen.saveLocation.getAbsolutePath() + separator + "tmp" + separator + MapGen.db_wurmZones.getName());
+		MapGen.db_wurmItems = new File(MapGen.saveLocation.getAbsolutePath() + separator + "tmp" + separator + MapGen.db_wurmItems.getName());
+		MapGen.db_wurmPlayers = new File(MapGen.saveLocation.getAbsolutePath() + separator + "tmp" + separator + MapGen.db_wurmPlayers.getName());
 	}
 	
 	public static void saveToFile(BufferedImage newImg, File file) throws IOException {
@@ -182,6 +184,10 @@ public class FileManagement {
 			System.out.println("[ERROR] Looks like you are using the default map or save location. Please change in your config file.");
 			return false;
 		}
+		
+		MapGen.showDeeds = Boolean.parseBoolean(prop.getProperty("showDeeds", Boolean.toString(MapGen.showDeeds)));
+		MapGen.showGuardTowers = Boolean.parseBoolean(prop.getProperty("showGuardTowers", Boolean.toString(MapGen.showGuardTowers)));
+		MapGen.showStructures = Boolean.parseBoolean(prop.getProperty("showStructures", Boolean.toString(MapGen.showStructures)));
 		
 		MapGen.gen_map_shading = Boolean.parseBoolean(prop.getProperty("mapGenerateShading", Boolean.toString(MapGen.gen_map_shading)));
 		MapGen.gen_map_shade_paths = Boolean.parseBoolean(prop.getProperty("mapShadePaths", Boolean.toString(MapGen.gen_map_shade_paths)));
