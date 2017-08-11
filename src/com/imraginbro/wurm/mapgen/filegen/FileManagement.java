@@ -145,6 +145,9 @@ public class FileManagement {
 		new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp").mkdirs();
 		for (int i = 0; i < fileBackupArray.length; i++) {
 			final File old = fileBackupArray[i];
+			if (!old.exists()) {
+				continue;
+			}
 			System.out.println("Creating a temp copy of "+old.getName()+"...");
 			try {
 				copyFile(old, new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + old.getName()));

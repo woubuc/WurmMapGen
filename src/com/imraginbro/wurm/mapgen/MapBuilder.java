@@ -173,25 +173,27 @@ public class MapBuilder {
 
 	private void drawBridges(BufferedImage imageTile, int imageTileX, int imageTileY) throws SQLException {
 		if (propertiesManager.gen_map_bridges) {
-			final int minX = (imageTileX * 256);
-			final int minY = (imageTileY * 256);
-			final int maxX = minX + 256;
-			final int maxY = minY + 256;
-			Graphics2D imageTileGraphics = imageTile.createGraphics();
-			Tile thisTile = Tiles.getTile(9);
-			Color tileColor = thisTile.getColor();
-			imageTileGraphics.setColor(tileColor);
-			Statement statement = dbhandler.getZonesConnection().createStatement();
-			ResultSet resultSet = statement.executeQuery("SELECT TILEX, TILEY FROM BRIDGEPARTS WHERE TILEX >= "+minX+" AND TILEY >= "+minY+" AND TILEX < "+maxX+" AND TILEY < "+maxY+";"); 
-			while (resultSet.next()) {
-				int tileX = resultSet.getInt("TILEX");
-				int tileY = resultSet.getInt("TILEY");
-				imageTileGraphics.fillRect((tileX - minX), (tileY - minY), 1, 1);
-				bridgeTileCount++;
+			if (dbhandler.checkZonesConnection()) {
+				final int minX = (imageTileX * 256);
+				final int minY = (imageTileY * 256);
+				final int maxX = minX + 256;
+				final int maxY = minY + 256;
+				Graphics2D imageTileGraphics = imageTile.createGraphics();
+				Tile thisTile = Tiles.getTile(9);
+				Color tileColor = thisTile.getColor();
+				imageTileGraphics.setColor(tileColor);
+				Statement statement = dbhandler.getZonesConnection().createStatement();
+				ResultSet resultSet = statement.executeQuery("SELECT TILEX, TILEY FROM BRIDGEPARTS WHERE TILEX >= "+minX+" AND TILEY >= "+minY+" AND TILEX < "+maxX+" AND TILEY < "+maxY+";"); 
+				while (resultSet.next()) {
+					int tileX = resultSet.getInt("TILEX");
+					int tileY = resultSet.getInt("TILEY");
+					imageTileGraphics.fillRect((tileX - minX), (tileY - minY), 1, 1);
+					bridgeTileCount++;
+				}
+				resultSet.close();
+				statement.close();
+				imageTileGraphics.dispose();
 			}
-			resultSet.close();
-			statement.close();
-			imageTileGraphics.dispose();
 		}
 	}
 

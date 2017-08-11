@@ -4,9 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.imraginbro.wurm.mapgen.MapBuilder;
+
 public class Structure {
 	
-	private DBHandler dbhandler;
 	private String structureName;
 	private long structureID;
 	private String ownerName;
@@ -16,8 +17,7 @@ public class Structure {
 	private int minY = -1;
 	private int maxY = -1;
 
-	public Structure(DBHandler dbhandler, Long structureID) {
-		this.dbhandler = dbhandler;
+	public Structure(Long structureID) {
 		this.structureID = structureID;
 		populateStructure();
 		populateOwnerName();
@@ -60,7 +60,7 @@ public class Structure {
 		Statement statement = null;
 		ResultSet result = null;
 		try {
-			statement = dbhandler.getZonesConnection().createStatement();
+			statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
 			result = statement.executeQuery("SELECT * FROM STRUCTURES WHERE WURMID='"+this.structureID+"';");
 			if (result.next()) {
 				this.ownerID = result.getLong("OWNERID");
@@ -87,7 +87,7 @@ public class Structure {
 		Statement statement = null;
 		ResultSet result = null;
 		try {
-			statement = dbhandler.getPlayersConnection().createStatement();
+			statement = MapBuilder.dbhandler.getPlayersConnection().createStatement();
 			result = statement.executeQuery("SELECT NAME FROM PLAYERS WHERE WURMID='"+this.ownerID+"';");
 			if (result.next()) {
 				this.ownerName = result.getString("NAME");
@@ -113,7 +113,7 @@ public class Structure {
 		Statement statement = null;
 		ResultSet result = null;
 		try {
-			statement = dbhandler.getZonesConnection().createStatement();
+			statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
 			result = statement.executeQuery("SELECT TILEX, TILEY FROM BUILDTILES WHERE STRUCTUREID='"+this.structureID+"';"); 
 			if (result.next()) {
 				minX = result.getInt("TILEX");
