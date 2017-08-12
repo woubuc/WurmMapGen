@@ -134,7 +134,7 @@ public class FileGeneration {
 	}
 
 	public void generateDeedsFile() throws IOException, SQLException {
-		if (!MapBuilder.propertiesManager.showDeeds || !MapBuilder.dbhandler.checkZonesConnection()) {
+		if (!MapBuilder.propertiesManager.showDeeds || !MapBuilder.dbhandler.checkZonesConnection() || !MapBuilder.dbhandler.checkItemsConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
 			System.out.println("Skipping deeds.js generation.");
 			return;
 		}
@@ -142,67 +142,66 @@ public class FileGeneration {
 		System.out.println("Writing deeds.js file...");
 		BufferedWriter bw = new BufferedWriter(new FileWriter(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "includes" + separator + "deeds.js", false));
 
-		StringBuilder mainDeedString = new StringBuilder();
-		StringBuilder deedBordersString = new StringBuilder();
-		StringBuilder deedMarkersString = new StringBuilder();
-
 		System.out.println("Loading deeds from wurmzones.db...");
 
 		Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();  
-		ResultSet resultSet = statement.executeQuery("SELECT * FROM VILLAGES WHERE DISBANDED=0;"); 
-
+		ResultSet resultSet = statement.executeQuery("SELECT ID FROM VILLAGES WHERE DISBANDED=0;"); 
+		
+		ArrayList<Village> villages = new ArrayList<Village>();
+		
+		while (resultSet.next()) {
+			villages.add(new Village(resultSet.getInt("ID")));
+		}
+		
+		resultSet.close();
+		statement.close();
+		
+		StringBuilder mainDeedString = new StringBuilder();
+		StringBuilder deedBordersString = new StringBuilder();
+		StringBuilder deedMarkersString = new StringBuilder();
+		
 		mainDeedString.append("function setViewOnMainDeed(map) {" + newLine);
 		deedBordersString.append("function deedBorders() {" + newLine
 				+ "\tvar deedBorders = [];" + newLine);
 		deedMarkersString.append("function deedMarkers() {" + newLine
 				+ "\tvar deedMarkers = [];" + newLine);
-
-		double mainX = 0;
-		double mainY = 0;
-
+		
 		int count = 0;
-		while (resultSet.next()) {
-			int sx = resultSet.getInt("STARTX");
-			int sy = resultSet.getInt("STARTY");
-			int ex = resultSet.getInt("ENDX");
-			int ey = resultSet.getInt("ENDY");
-			double x = (sx + ex + 1) / 2;
-			double y = (sy + ey + 1) / 2;
+		boolean setMainDeed = false;
+		for (int i = 0; i < villages.size(); i++) {
+			final Village vi = villages.get(i);
 
 			deedBordersString.append("\tdeedBorders.push(L.polygon(["
-					+ "xy("+sx+","+sy+"),"
-					+ "xy("+(ex+1)+","+sy+"),"
-					+ "xy("+(ex+1)+","+(ey+1)+"),"
-					+ "xy("+sx+","+(ey+1)+")]");
-
-			boolean perm = resultSet.getBoolean("PERMANENT");
-
-			if (perm) {
+					+ "xy("+vi.getStartX()+","+vi.getStartY()+"),"
+					+ "xy("+(vi.getEndX()+1)+","+vi.getStartY()+"),"
+					+ "xy("+(vi.getEndX()+1)+","+(vi.getEndY()+1)+"),"
+					+ "xy("+vi.getStartX()+","+(vi.getEndY()+1)+")]");
+			if (vi.isPermanent()) {
 				deedBordersString.append(", {color:'orange',fillOpacity:0,weight:1})");
-				if (mainX == 0 && mainY == 0) {
-					mainX = x;
-					mainY = y;
-					mainDeedString.append("\tmap.setView(xy("+mainX+","+mainY+"), config.mapMaxZoom-1)" + newLine);
+				if (!setMainDeed) {
+					mainDeedString.append("\tmap.setView(xy("+vi.getTokenX()+","+vi.getTokenY()+"), config.mapMaxZoom-1)" + newLine);
+					setMainDeed = true;
 				}
 			} else {
 				deedBordersString.append(", {color:'white',fillOpacity:0,weight:1})");
 			}
-			deedBordersString.append(".bindPopup(\"" + resultSet.getString("NAME") + "\"));" + newLine);
+			deedBordersString.append(".bindPopup(\"" + vi.getVillageName() + "\"));" + newLine);
 
-			String firstLetter = resultSet.getString("NAME").substring(0, 1).toLowerCase();
+			String firstLetter = vi.getVillageName().substring(0, 1).toLowerCase();
 			deedMarkersString.append("\tdeedMarkers.push(L.marker("
-					+ "xy("+(x+0.5)+","+(y+0.5)+"),");
-			if (perm) {
+					+ "xy("+(vi.getTokenX()+0.5)+","+(vi.getTokenY()+0.5)+"),");
+			if (vi.isPermanent()) {
 				deedMarkersString.append("{icon: mainIcon})");
 			} else {
 				deedMarkersString.append("{icon: letter_"+firstLetter+"Icon})");
 			}
-			deedMarkersString.append(".bindPopup(\""+resultSet.getString("NAME")+"\"));" + newLine);
+			deedMarkersString.append(".bindPopup(\"<div align='center'><b>"+vi.getVillageName()+"</b><br>"
+					+ "<i>" + vi.getMotto() + "</i></div><br>"
+					+ "<b>Mayor:</b> " + vi.getMayorName() + "<br>"
+					+ "<b>Citizens:</b> " + vi.getCitizenCount() + "\"));" + newLine);
+			
 			count++;
 		}
-
-		resultSet.close();
-		statement.close();
 
 		mainDeedString.append("}" + newLine + newLine);
 		deedBordersString.append("\treturn deedBorders;" + newLine + "}" + newLine + newLine);
