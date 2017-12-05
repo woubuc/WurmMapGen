@@ -9,7 +9,5 @@ public class MapGen {
 		final long totalTime = (endTime - startTime)/1000;
 		System.out.println("Finished with map generation! " + totalTime + " seconds.");
 	}
-
+	
 }
-
-
