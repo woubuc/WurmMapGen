@@ -80,11 +80,10 @@ public class FileManagement {
 	 *
 	 */
 	public void copyTemplate() throws IOException {
-		System.out.println("Copying resources");
-		if (MapBuilder.propertiesManager.verbose) System.out.println("     source path: " + templateDirectory.getAbsolutePath());
-		
+		System.out.println("Template files");
 		FileUtils.copyDirectory(templateDirectory, new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath()));
-		if (MapBuilder.propertiesManager.verbose) System.out.println("  OK resources copied");
+		System.out.println("    OK template files copied");
+		System.out.println();
 	}
 	
 	@SuppressWarnings("resource")

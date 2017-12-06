@@ -3,6 +3,7 @@ package com.imraginbro.wurm.mapgen.filegen;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,11 +12,13 @@ import java.util.ArrayList;
 
 import com.imraginbro.wurm.mapgen.MapBuilder;
 import com.wurmonline.mesh.MeshIO;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class FileGeneration {
 
-	final static String newLine = System.lineSeparator();
-	final static String separator = java.io.File.separator;
+	private final static String newLine = System.lineSeparator();
+	private final static String separator = java.io.File.separator;
 
 	private int html_nativeZoom = 0;
 	private int html_mapMinZoom = 0;
@@ -30,122 +33,188 @@ public class FileGeneration {
 		generateStructuresFile();
 		generateConfigFile();
 	}
-
-	public void generateStructuresFile() throws IOException, SQLException {
-		if (!MapBuilder.propertiesManager.showStructures || !MapBuilder.dbhandler.checkZonesConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
-			System.out.println("Skipping structures.js generation.");
+	
+	/**
+	 * Generates the structures JSON data and writes it to data/structures.json
+	 */
+	@SuppressWarnings("unchecked")
+	private void generateStructuresFile() throws IOException, SQLException {
+		System.out.println();
+		System.out.println("Structure data");
+		
+		// Check if we should be loading structures at all
+		if (!MapBuilder.propertiesManager.showStructures) {
+			System.out.println("  SKIP show structures is disabled");
 			return;
 		}
+		
+		// Check if we're connected to the necessary databases
+		if (!MapBuilder.dbhandler.checkZonesConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
+			System.err.println("  WARN could not connect to one or more databases");
+			return;
+		}
+		
+		// Prepare JSON container object
+		JSONObject dataObject = new JSONObject();
+		JSONArray data = new JSONArray();
 
-		System.out.println("Writing structures.js file...");
-		BufferedWriter bw = new BufferedWriter(new FileWriter(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "includes" + separator + "structures.js", false));
-
-		System.out.println("Loading structures from wurmzones.db...");
-
-		Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();  
-		ResultSet resultSet = statement.executeQuery("SELECT WURMID FROM STRUCTURES WHERE FINISHED='1';"); 
-
-		bw.append("function getStructures() {" + newLine
-				+ "\tvar structureBorders = [];" + newLine);
+		if (MapBuilder.propertiesManager.verbose) System.out.println("       loading structures from wurmzones.db");
+		Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
+		ResultSet resultSet = statement.executeQuery("SELECT WURMID FROM STRUCTURES WHERE FINISHED='1';");
+		
+		// Keep track of the number of structures loaded
 		int count = 0;
+		
+		// Prepare structure JSON objects
+		JSONObject structureData;
+		JSONArray structureBorders;
+		
 		while (resultSet.next()) {
+			count++;
+			
+			// Create JSON objects that will contain structure data
+			structureData = new JSONObject();
+			structureBorders = new JSONArray();
+			
 			long structureID = resultSet.getLong("WURMID");
 			Structure structure = new Structure(structureID);
-			bw.append("\tstructureBorders.push(L.polygon(["
-					+ "xy("+structure.getMinX()+","+structure.getMinY()+"),"
-					+ "xy("+structure.getMaxX()+","+structure.getMinY()+"),"
-					+ "xy("+structure.getMaxX()+","+structure.getMaxY()+"),"
-					+ "xy("+structure.getMinX()+","+structure.getMaxY()+")]"
-					+ ", {color:'blue',fillOpacity:0.1,weight:1})"
-					+ ".bindPopup(\"<div align='center'><b>" + structure.getStructureName() + "</b><br>"
-					+ "<i>Created by " + structure.getOwnerName() + "</i></div>\"));" + newLine);
-			count++;
+			
+			// Add borders to JSON data
+			structureBorders.add(structure.getMinX());
+			structureBorders.add(structure.getMinY());
+			structureBorders.add(structure.getMaxX());
+			structureBorders.add(structure.getMaxY());
+			structureData.put("borders", structureBorders);
+			
+			// Add creator to JSON data
+			structureData.put("creator", structure.getOwnerName());
+			data.add(structureData);
 		}
 
 		resultSet.close();
 		statement.close();
-
-		bw.append("\treturn structureBorders;" + newLine + "}");
-		bw.close();
-
-		System.out.println("Added " + count + " structures to structures.js...");
-	}
-
-	public void generateGuardTowersFile() throws IOException, SQLException {
-		if (!MapBuilder.propertiesManager.showGuardTowers || !MapBuilder.dbhandler.checkItemsConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
-			System.out.println("Skipping guardtowers.js generation.");
+		
+		if (count == 0) {
+			System.out.println("  SKIP no structures found");
 			return;
 		}
+		
+		dataObject.put("structures", data);
+		
+		// Write JSON data to file
+		if (MapBuilder.propertiesManager.verbose) System.out.println("       writing data/structures.json");
+		FileWriter writer = new FileWriter(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "structures.json").toString(), false);
+		writer.write(dataObject.toJSONString());
+		writer.close();
 
-		System.out.println("Writing guardtowers.js file...");
-		BufferedWriter bw = new BufferedWriter(new FileWriter(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "includes" + separator + "guardtowers.js", false));
-
-		StringBuilder GTBordersString = new StringBuilder();
-		StringBuilder GTMarkersString = new StringBuilder();
-
-		System.out.println("Loading guard towers from wurmitems.db...");
-		Statement statement = MapBuilder.dbhandler.getItemsConnection().createStatement();  
+		System.out.println("    OK added " + count + " entries to structures.json");
+	}
+	
+	/**
+	 * Generates the guard tower JSON data and writes it to data/guardtowers.json
+	 */
+	@SuppressWarnings("unchecked")
+	private void generateGuardTowersFile() throws IOException, SQLException {
+		System.out.println();
+		System.out.println("Guard tower data");
+		
+		// Check if guard towers aren't disabled
+		if (!MapBuilder.propertiesManager.showGuardTowers) {
+			System.out.println("  SKIP show guard towers is disabled");
+			return;
+		}
+		
+		// Check if we're connected to the necessary databases
+		if (!MapBuilder.dbhandler.checkItemsConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
+			System.err.println("  WARN could not connect to one or more databases");
+			return;
+		}
+		
+		if (MapBuilder.propertiesManager.verbose) System.out.println("       loading guard towers from wurmitems.db");
+		Statement statement = MapBuilder.dbhandler.getItemsConnection().createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT * FROM ITEMS WHERE "
-				+ "(TEMPLATEID='384' OR TEMPLATEID='430' OR TEMPLATEID='528' OR TEMPLATEID='638' OR TEMPLATEID='996') AND CREATIONSTATE='0';"); 
+				+ "(TEMPLATEID='384' OR TEMPLATEID='430' OR TEMPLATEID='528' OR TEMPLATEID='638' OR TEMPLATEID='996') AND CREATIONSTATE='0';");
 
-		ArrayList<GuardTower> guardTowers = new ArrayList<GuardTower>();
+		ArrayList<GuardTower> guardTowers = new ArrayList<>();
 
 		while (resultSet.next()) {
-			guardTowers.add(new GuardTower(resultSet.getLong("LASTOWNERID"), 
-					(int) Math.floor(resultSet.getInt("POSX")/4), 
-					(int) Math.floor(resultSet.getInt("POSY")/4), 
+			guardTowers.add(new GuardTower(resultSet.getLong("LASTOWNERID"),
+					(int) Math.floor(resultSet.getInt("POSX")/4),
+					(int) Math.floor(resultSet.getInt("POSY")/4),
 					resultSet.getFloat("QUALITYLEVEL"), resultSet.getFloat("DAMAGE")));
 		}
 
 		resultSet.close();
 		statement.close();
-
-		GTBordersString.append("function getGuardTowerBorders() {" + newLine
-				+ "\tvar guardTowerBorders = [];" + newLine);
-		GTMarkersString.append("function getGuardTowers() {" + newLine
-				+ "\tvar guardTower = [];" + newLine);
-
-		final DecimalFormat f = new DecimalFormat("0.00");
-		for (int i = 0; i < guardTowers.size(); i++) {
-			final GuardTower gt = guardTowers.get(i);
-			GTBordersString.append("\tguardTowerBorders.push(L.polygon(["
-					+ "xy("+(gt.getMinX())+","+(gt.getMinY())+"),"
-					+ "xy("+(gt.getMaxX()+1)+","+(gt.getMinY())+"),"
-					+ "xy("+(gt.getMaxX()+1)+","+(gt.getMaxY()+1)+"),"
-					+ "xy("+(gt.getMinX())+","+(gt.getMaxY()+1)+")]"
-					+ ", {color:'red',fillOpacity:0.1,weight:1}));" + newLine);
-			GTMarkersString.append("\tguardTower.push(L.marker("
-					+ "xy("+(gt.getX()+0.5)+","+(gt.getY()+0.5)+"),"
-					+ "{icon: guardTowerIcon})"
-					+ ".bindPopup(\"<div align='center'><b>Guard Tower</b><br>"
-					+ "<i>Created by " + gt.getOwnerName() + "</i></div><br>"
-					+ "<b>QL:</b> " + f.format(gt.getQL()) + "<br>"
-					+ "<b>DMG:</b> " + f.format(gt.getDMG()) + "\"));" + newLine);
-		}
-
-		GTBordersString.append("\treturn guardTowerBorders;" + newLine + "}" + newLine + newLine);
-		GTMarkersString.append("\treturn guardTower;" + newLine + "}");
-
-		bw.append(GTBordersString);
-		bw.append(GTMarkersString);
-		bw.close();
-
-		System.out.println("Added " + guardTowers.size() + " guard towers to guardtowers.js...");
-	}
-
-	public void generateDeedsFile() throws IOException, SQLException {
-		if (!MapBuilder.propertiesManager.showDeeds || !MapBuilder.dbhandler.checkZonesConnection() || !MapBuilder.dbhandler.checkItemsConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
-			System.out.println("Skipping deeds.js generation.");
+		
+		if (guardTowers.size() == 0) {
+			System.out.println("  SKIP no guard towers found");
 			return;
 		}
 
-		System.out.println("Writing deeds.js file...");
-		BufferedWriter bw = new BufferedWriter(new FileWriter(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "includes" + separator + "deeds.js", false));
+		final DecimalFormat f = new DecimalFormat("0.00");
+		
+		// Prepare JSON objects
+		JSONObject dataObject = new JSONObject();
+		JSONArray data = new JSONArray();
+		
+		JSONObject towerData;
+		JSONArray towerBorders;
+		
+		for (final GuardTower guardTower : guardTowers) {
+			towerData = new JSONObject();
+			towerBorders = new JSONArray();
+			
+			towerBorders.add(guardTower.getMinX());
+			towerBorders.add(guardTower.getMinY());
+			towerBorders.add(guardTower.getMaxX());
+			towerBorders.add(guardTower.getMaxY());
+			towerData.put("borders", towerBorders);
+			
+			towerData.put("x", guardTower.getX());
+			towerData.put("y", guardTower.getY());
+			
+			towerData.put("creator", guardTower.getOwnerName());
+			towerData.put("ql", f.format(guardTower.getQL()));
+			towerData.put("dmg", f.format(guardTower.getDMG()));
+			
+			data.add(towerData);
+		}
+		
+		dataObject.put("guardtowers", data);
+		
+		// Write JSON data to file
+		if (MapBuilder.propertiesManager.verbose) System.out.println("       creating data/guardtowers.json");
+		FileWriter writer = new FileWriter(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "guardtowers.json").toString(), false);
+		writer.write(dataObject.toJSONString());
+		writer.close();
 
-		System.out.println("Loading deeds from wurmzones.db...");
-
-		Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();  
-		ResultSet resultSet = statement.executeQuery("SELECT ID FROM VILLAGES WHERE DISBANDED=0;"); 
+		System.out.println("    OK added " + guardTowers.size() + " entries to guardtowers.json");
+	}
+	
+	/**
+	 * Generates deeds JSON data and writes it to data/deeds.json
+	 */
+	@SuppressWarnings("unchecked")
+	private void generateDeedsFile() throws IOException, SQLException {
+		System.out.println();
+		System.out.println("Deeds data");
+		
+		// Check if guard towers aren't disabled
+		if (!MapBuilder.propertiesManager.showDeeds) {
+			System.out.println("  SKIP show deeds is disabled");
+			return;
+		}
+		
+		// Check if we're connected to the necessary databases
+		if (!MapBuilder.dbhandler.checkZonesConnection() || !MapBuilder.dbhandler.checkItemsConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
+			System.err.println("  WARN could not connect to one or more databases");
+			return;
+		}
+		
+		if (MapBuilder.propertiesManager.verbose) System.out.println("       loading deeds from wurmzones.db");
+		Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
+		ResultSet resultSet = statement.executeQuery("SELECT ID FROM VILLAGES WHERE DISBANDED=0;");
 		
 		ArrayList<Village> villages = new ArrayList<Village>();
 		
@@ -156,86 +225,79 @@ public class FileGeneration {
 		resultSet.close();
 		statement.close();
 		
-		StringBuilder mainDeedString = new StringBuilder();
-		StringBuilder deedBordersString = new StringBuilder();
-		StringBuilder deedMarkersString = new StringBuilder();
-		
-		mainDeedString.append("function setViewOnMainDeed(map) {" + newLine);
-		deedBordersString.append("function deedBorders() {" + newLine
-				+ "\tvar deedBorders = [];" + newLine);
-		deedMarkersString.append("function deedMarkers() {" + newLine
-				+ "\tvar deedMarkers = [];" + newLine);
-		
-		int count = 0;
-		boolean setMainDeed = false;
-		for (int i = 0; i < villages.size(); i++) {
-			final Village vi = villages.get(i);
-
-			deedBordersString.append("\tdeedBorders.push(L.polygon(["
-					+ "xy("+vi.getStartX()+","+vi.getStartY()+"),"
-					+ "xy("+(vi.getEndX()+1)+","+vi.getStartY()+"),"
-					+ "xy("+(vi.getEndX()+1)+","+(vi.getEndY()+1)+"),"
-					+ "xy("+vi.getStartX()+","+(vi.getEndY()+1)+")]");
-			if (vi.isPermanent()) {
-				deedBordersString.append(", {color:'orange',fillOpacity:0,weight:1})");
-				if (!setMainDeed) {
-					mainDeedString.append("\tmap.setView(xy("+vi.getTokenX()+","+vi.getTokenY()+"), config.mapMaxZoom-1)" + newLine);
-					setMainDeed = true;
-				}
-			} else {
-				deedBordersString.append(", {color:'white',fillOpacity:0,weight:1})");
-			}
-			deedBordersString.append(".bindPopup(\"" + vi.getVillageName() + "\"));" + newLine);
-
-			String firstLetter = vi.getVillageName().substring(0, 1).toLowerCase();
-			deedMarkersString.append("\tdeedMarkers.push(L.marker("
-					+ "xy("+(vi.getTokenX()+0.5)+","+(vi.getTokenY()+0.5)+"),");
-			if (vi.isPermanent()) {
-				deedMarkersString.append("{icon: mainIcon})");
-			} else {
-				deedMarkersString.append("{icon: letter_"+firstLetter+"Icon})");
-			}
-			deedMarkersString.append(".bindPopup(\"<div align='center'><b>"+vi.getVillageName()+"</b><br>"
-					+ "<i>" + vi.getMotto() + "</i></div><br>"
-					+ "<b>Mayor:</b> " + vi.getMayorName() + "<br>"
-					+ "<b>Citizens:</b> " + vi.getCitizenCount() + "\"));" + newLine);
-			
-			count++;
+		if (villages.size() == 0) {
+			System.out.println("  SKIP no deeds found");
+			return;
 		}
-
-		mainDeedString.append("}" + newLine + newLine);
-		deedBordersString.append("\treturn deedBorders;" + newLine + "}" + newLine + newLine);
-		deedMarkersString.append("\treturn deedMarkers;" + newLine + "}");
-
-		bw.append(mainDeedString);
-		bw.append(deedBordersString);
-		bw.append(deedMarkersString);
-		bw.close();
-
-		System.out.println("Added "+count+" deeds to deeds.js...");
+		
+		final DecimalFormat f = new DecimalFormat("0.00");
+		
+		// Prepare JSON objects
+		JSONObject dataObject = new JSONObject();
+		JSONArray data = new JSONArray();
+		
+		JSONObject deedData;
+		JSONArray deedBorders;
+		
+		for (final Village village : villages) {
+			deedData = new JSONObject();
+			deedBorders = new JSONArray();
+			
+			deedBorders.add(village.getStartX());
+			deedBorders.add(village.getStartY());
+			deedBorders.add(village.getEndX());
+			deedBorders.add(village.getEndY());
+			deedData.put("borders", deedBorders);
+			
+			deedData.put("name", village.getVillageName());
+			deedData.put("motto", village.getMotto());
+			deedData.put("permanent", village.isPermanent());
+			
+			deedData.put("x", village.getTokenX() + 0.5);
+			deedData.put("y", village.getTokenY() + 0.5);
+			
+			deedData.put("mayor", village.getMayorName());
+			deedData.put("citizens", village.getCitizenCount());
+			
+			data.add(deedData);
+		}
+		
+		dataObject.put("deeds", data);
+		
+		// Write JSON data to file
+		if (MapBuilder.propertiesManager.verbose) System.out.println("       creating data/deeds.json");
+		FileWriter writer = new FileWriter(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "deeds.json").toString(), false);
+		writer.write(dataObject.toJSONString());
+		writer.close();
+		
+		System.out.println("    OK added " + villages.size() + " entries to deeds.json");
 	}
 
 	public void generateConfigFile() throws IOException {
-		System.out.println("Writing config.js file...");
-		BufferedWriter bw = new BufferedWriter(new FileWriter(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "includes" + separator + "config.js", false));
-		bw.append("function Config() {}" + newLine
-				+ "var config = new Config();" + newLine
-				+ "config.nativeZoom = "+html_nativeZoom+";" + newLine
-				+ "config.mapMinZoom = "+html_mapMinZoom+";" + newLine
-				+ "config.mapMaxZoom = "+html_mapMaxZoom+";" + newLine
-				+ "config.actualMapSize = "+html_actualMapSize+";" + newLine
-				+ "config.maxMapSize = "+html_maxMapSize+";" + newLine
-				+ newLine
-				+ "var xyMulitiplier = (config.actualMapSize / 256);" + newLine
-				+ newLine
-				+ "var yx = L.latLng;" + newLine
-				+ "var xy = function(x, y) {" + newLine
-				+ "\treturn yx(-(y / xyMulitiplier), (x / xyMulitiplier));" + newLine
-				+ "};");
-		bw.close();
+		System.out.println();
+		System.out.println("Config data");
+		
+		JSONObject configObject = new JSONObject();
+		JSONObject config = new JSONObject();
+		
+		config.put("nativeZoom", html_nativeZoom);
+		config.put("mapMinZoom", html_mapMinZoom);
+		config.put("mapMaxZoom", html_mapMaxZoom);
+		config.put("actualMapSize", html_actualMapSize);
+		config.put("maxMapSize", html_maxMapSize);
+		
+		configObject.put("config", config);
+		
+		if (MapBuilder.propertiesManager.verbose) System.out.println("       creating data/config.json");
+		FileWriter writer = new FileWriter(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "config.json").toString(), false);
+		writer.write(configObject.toJSONString());
+		writer.close();
+		
+		System.out.println("    OK wrote config data to config.json");
 	}
 
 	public void setHTMLvars(MeshIO map) {
+		System.out.println();
 		System.out.println("Generating config.js variables...");
 		html_actualMapSize = map.getSize();
 		html_maxMapSize = html_actualMapSize * 8;
