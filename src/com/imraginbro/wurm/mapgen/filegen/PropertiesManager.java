@@ -16,6 +16,8 @@ public class PropertiesManager {
 	public Boolean showGuardTowers = true;
 	public Boolean showStructures = true;
 	
+	public Boolean verbose = false;
+	
 	public int threadLimit = 2;
 	
 	public Boolean gen_map_shading = true;
@@ -30,7 +32,7 @@ public class PropertiesManager {
 	
 	private void copyFromJar() {
 		try {
-			InputStream in = this.getClass().getResourceAsStream("/resources/" + this.propertiesFile);
+			InputStream in = this.getClass().getResourceAsStream("./" + this.propertiesFile);
 			MapBuilder.fileManager.copy(in, this.propertiesFile);
 			in.close();
 		} catch(Exception e) {
@@ -74,6 +76,8 @@ public class PropertiesManager {
 		this.showDeeds = Boolean.parseBoolean(prop.getProperty("showDeeds", Boolean.toString(this.showDeeds)));
 		this.showGuardTowers = Boolean.parseBoolean(prop.getProperty("showGuardTowers", Boolean.toString(this.showGuardTowers)));
 		this.showStructures = Boolean.parseBoolean(prop.getProperty("showStructures", Boolean.toString(this.showStructures)));
+		
+		this.verbose = Boolean.parseBoolean(prop.getProperty("verbose", Boolean.toString(this.verbose)));
 		
 		this.threadLimit = Integer.parseInt(prop.getProperty("threads", Integer.toString(this.threadLimit)));
 		

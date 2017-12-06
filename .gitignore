@@ -1,6 +1,7 @@
 *.class
 *.jar
 *.iml
+*.dev.properties
 
 .idea
 dist
