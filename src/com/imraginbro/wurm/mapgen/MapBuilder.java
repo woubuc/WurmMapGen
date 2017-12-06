@@ -44,7 +44,7 @@ public class MapBuilder {
 		dbhandler.load();
 		System.out.println("Starting map generation...");
 		start();
-		fileManager.extractRescources("/resources/required.zip");
+		fileManager.copyTemplate();
 		fileGenerator.generateFiles();
 		dbhandler.closeConnections();
 		map.close();

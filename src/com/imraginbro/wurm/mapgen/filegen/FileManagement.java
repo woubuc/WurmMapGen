@@ -23,6 +23,7 @@ import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
 
 import com.imraginbro.wurm.mapgen.MapBuilder;
+import org.apache.commons.io.FileUtils;
 
 public class FileManagement {
 	
@@ -34,6 +35,7 @@ public class FileManagement {
 	public File db_wurmPlayers = null;
 	
 	File[] fileBackupArray = null;
+	private final File templateDirectory = new File("./template");
 	
 	public void load() {
 		map_topLayer = new File(MapBuilder.propertiesManager.wurmMapLocation.getAbsolutePath() + separator + "top_layer.map");
@@ -72,52 +74,18 @@ public class FileManagement {
         }
     }
 	
-	public void extractRescources(String zipFileLocation) throws Exception {
-		System.out.println("Copying "+zipFileLocation+" file from jar...");
-		InputStream in = FileManagement.class.getResourceAsStream(zipFileLocation);
-		copy(in, MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + "required.zip");	
-		in.close();
-		System.out.println("Extracting resources from "+zipFileLocation+"...");
-		unzip(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + "required.zip", MapBuilder.propertiesManager.saveLocation.getAbsolutePath());
+	/**
+	 * Copies the html, css and js template files from the /template directory located next to the .jar
+	 * into the output directory.
+	 *
+	 */
+	public void copyTemplate() throws IOException {
+		System.out.println("Copying resources");
+		if (MapBuilder.propertiesManager.verbose) System.out.println("     source path: " + templateDirectory.getAbsolutePath());
+		
+		FileUtils.copyDirectory(templateDirectory, new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath()));
+		if (MapBuilder.propertiesManager.verbose) System.out.println("  OK resources copied");
 	}
-	
-	public void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-		if (!MapBuilder.propertiesManager.replaceFiles && new File(filePath).exists()) {
-			return;
-		}
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
-        byte[] bytesIn = new byte[4096];
-        int read = 0;
-        while ((read = zipIn.read(bytesIn)) != -1) {
-            bos.write(bytesIn, 0, read);
-        }
-        bos.close();
-    }
-	
-	public void unzip(String zipFilePath, String destDirectory) throws IOException {
-        File destDir = new File(destDirectory);
-        if (!destDir.exists()) {
-            destDir.mkdir();
-        }
-        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
-        ZipEntry entry = zipIn.getNextEntry();
-        while (entry != null) {
-            String filePath = destDirectory + separator + entry.getName();
-            File checkDir = new File(destDirectory + separator + entry.getName()).getParentFile();
-            if (!checkDir.exists()) {
-            	checkDir.mkdir();
-            }
-            new File(destDirectory).mkdirs();
-            if (!entry.isDirectory()) {
-                extractFile(zipIn, filePath);
-            } else {
-                new File(filePath).mkdirs();
-            }
-            zipIn.closeEntry();
-            entry = zipIn.getNextEntry();
-        }
-        zipIn.close();
-    }
 	
 	@SuppressWarnings("resource")
 	public void copyFile(File sourceFile, File destFile) throws IOException {
