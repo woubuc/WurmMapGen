@@ -1,4 +1,4 @@
-package com.imraginbro.wurm.mapgen.filegen;
+package com.imraginbro.wurm.mapgen;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

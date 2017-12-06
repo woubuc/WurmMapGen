@@ -1,4 +1,4 @@
-package com.imraginbro.wurm.mapgen.filegen;
+package com.imraginbro.wurm.mapgen;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -25,7 +25,7 @@ import javax.imageio.stream.ImageOutputStream;
 import com.imraginbro.wurm.mapgen.MapBuilder;
 import org.apache.commons.io.FileUtils;
 
-public class FileManagement {
+public class FileManager {
 	
 	final static String separator = java.io.File.separator;
 	
@@ -77,7 +77,6 @@ public class FileManagement {
 	/**
 	 * Copies the html, css and js template files from the /template directory located next to the .jar
 	 * into the output directory.
-	 *
 	 */
 	public void copyTemplate() throws IOException {
 		System.out.println("Template files");

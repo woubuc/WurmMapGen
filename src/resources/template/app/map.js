@@ -1,21 +1,24 @@
 'use strict';
 
 WurmMapGen.map = {
-	
+
 	/**
 	 * Initialises and creates the map interface
 	 */
 	create: function() {
-		var config = WurmMapGen.data.config;
+		var config = WurmMapGen.config;
 		var xy = WurmMapGen.util.xy;
-		
+
 		// Set up the map
 		var map = WurmMapGen.map.map = L.map('map', {
 			maxBounds: [xy(0,0), xy(config.actualMapSize,config.actualMapSize)],
 			maxZoom: config.mapMaxZoom,
 			minZoom: config.mapMinZoom,
-			crs: L.CRS.Simple
+			crs: L.CRS.Simple,
+			zoomControl: false
 		});
+
+		new L.Control.Zoom({position: 'bottomright'}).addTo(map);
 
 		var mapBounds = new L.LatLngBounds(
 			map.unproject([0, config.maxMapSize], config.mapMaxZoom),
@@ -41,11 +44,11 @@ WurmMapGen.map = {
 		var guardtowerMarkers = L.layerGroup();
 		var structureBorders = L.layerGroup();
 		var playerMarkers = L.layerGroup();
-		
+
 		// Add deeds
-		for (var i = 0; i < WurmMapGen.data.deeds.length; i++) {
-			var deed = WurmMapGen.data.deeds[i];
-			
+		for (var i = 0; i < WurmMapGen.deeds.length; i++) {
+			var deed = WurmMapGen.deeds[i];
+
 			// Create polygon based on deed border data
 			var border = L.polygon([
 				xy(deed.borders[0], deed.borders[1]),
@@ -57,24 +60,24 @@ WurmMapGen.map = {
 				fillOpacity: 0,
 				weight: 1
 			});
-			
+
 			var marker = L.marker(xy(deed.x, deed.y),
 				{icon: WurmMapGen.markers[deed.permanent ? 'main' : 'letter_' + deed.name.charAt(0)]}
 			);
-				
+
 			marker.bindPopup('<div align="center"><b>' + deed.name + '</b><br><i>' + deed.motto + '</i></div><br><b>Mayor:</b> ' + deed.mayor + '<br><b>Citizens:</b> ' + deed.citizens + '');
-			
+
 			// Open the marker popup when the border is clicked
 			border.on('click', function() { marker.openPopup(); });
-			
+
 			deedBorders.addLayer(border);
 			deedMarkers.addLayer(marker);
 		}
-		
+
 		// Add guard towers
-		for (var i = 0; i < WurmMapGen.data.guardtowers.length; i++) {
-			var tower = WurmMapGen.data.guardtowers[i];
-			
+		for (var i = 0; i < WurmMapGen.guardtowers.length; i++) {
+			var tower = WurmMapGen.guardtowers[i];
+
 			// Create polygon based on guard tower border data
 			var border = L.polygon([
 				xy(tower.borders[0], tower.borders[1]),
@@ -86,20 +89,41 @@ WurmMapGen.map = {
 				fillOpacity: 0.1,
 				weight: 1
 			});
-			
+
 			var marker = L.marker(xy(deed.x, deed.y),
 				{icon: WurmMapGen.markers.guardtower}
 			);
-				
+
 			marker.bindPopup('<div align="center"><b>' + deed.name + '</b><br><i>' + deed.motto + '</i></div><br><b>Mayor:</b> ' + deed.mayor + '<br><b>Citizens:</b> ' + deed.citizens + '');
-			
+
 			// Open the marker popup when the border is clicked
 			border.on('click', function() { marker.openPopup(); });
-			
+
 			guardtowerBorders.addLayer(border);
 			guardtowerMarkers.addLayer(marker);
 		}
-		
+
+		// Add structures
+		for (var i = 0; i < WurmMapGen.structures.length; i++) {
+			var structure = WurmMapGen.structures[i];
+
+			// Create polygon based on guard tower border data
+			var border = L.polygon([
+				xy(structure.borders[0], structure.borders[1]),
+				xy(structure.borders[2], structure.borders[1]),
+				xy(structure.borders[2], structure.borders[3]),
+				xy(structure.borders[0], structure.borders[3])
+			], {
+				color: 'blue',
+				fillOpacity: 0.1,
+				weight: 1
+			});
+
+			border.bindPopup('<div align="center"><b>' + structure.getStructureName() + '</b><br><i>Created by ' + structure.getOwnerName() + '</i></div>');
+
+			structureBorders.addLayer(border);
+		}
+
 		// Add layers to map
 		deedBorders.addTo(map);
 		deedMarkers.addTo(map);
@@ -107,7 +131,7 @@ WurmMapGen.map = {
 		guardtowerMarkers.addTo(map);
 		structureBorders.addTo(map);
 		playerMarkers.addTo(map);
-		
+
         // Add overlay control
 		var overlayData = {
 			"Player Markers": playerMarkers,
@@ -117,9 +141,9 @@ WurmMapGen.map = {
 			"Guard Tower Markers": guardtowerMarkers,
 			"Guard Tower Borders": guardtowerBorders
 		};
-		
+
 		L.control.layers(null, overlayData).addTo(map);
-		
+
 		// Add coordinates display
 		L.control.coordinates({
 			position:"bottomleft",

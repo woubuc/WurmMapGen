@@ -12,10 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
-import com.imraginbro.wurm.mapgen.filegen.DBHandler;
-import com.imraginbro.wurm.mapgen.filegen.FileGeneration;
-import com.imraginbro.wurm.mapgen.filegen.FileManagement;
-import com.imraginbro.wurm.mapgen.filegen.PropertiesManager;
+import com.imraginbro.wurm.mapgen.filegen.FileGen;
 import com.wurmonline.mesh.MeshIO;
 import com.wurmonline.mesh.Tiles;
 import com.wurmonline.mesh.Tiles.Tile;
@@ -26,9 +23,9 @@ public class MapBuilder {
 	private int threadCounter = 0;
 	private int bridgeTileCount = 0;
 
-	public final static FileManagement fileManager = new FileManagement();
+	public final static FileManager fileManager = new FileManager();
 	public final static PropertiesManager propertiesManager = new PropertiesManager();
-	public final static FileGeneration fileGenerator = new FileGeneration();
+	public final static FileGen fileGenerator = new FileGen();
 	public final static DBHandler dbhandler = new DBHandler();
 
 	public static MeshIO map;
@@ -183,7 +180,7 @@ public class MapBuilder {
 				Color tileColor = thisTile.getColor();
 				imageTileGraphics.setColor(tileColor);
 				Statement statement = dbhandler.getZonesConnection().createStatement();
-				ResultSet resultSet = statement.executeQuery("SELECT TILEX, TILEY FROM BRIDGEPARTS WHERE TILEX >= "+minX+" AND TILEY >= "+minY+" AND TILEX < "+maxX+" AND TILEY < "+maxY+";"); 
+				ResultSet resultSet = statement.executeQuery("SELECT TILEX, TILEY FROM BRIDGEPARTS WHERE TILEX >= "+minX+" AND TILEY >= "+minY+" AND TILEX < "+maxX+" AND TILEY < "+maxY+";");
 				while (resultSet.next()) {
 					int tileX = resultSet.getInt("TILEX");
 					int tileY = resultSet.getInt("TILEY");

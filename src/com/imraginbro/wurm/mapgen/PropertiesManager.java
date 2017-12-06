@@ -1,4 +1,4 @@
-package com.imraginbro.wurm.mapgen.filegen;
+package com.imraginbro.wurm.mapgen;
 
 import java.io.File;
 import java.io.FileInputStream;

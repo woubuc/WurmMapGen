@@ -2,26 +2,24 @@
 
 // IIFE scope
 (function() {
-	
+
 	// Prepare arrays for loaded data
-	WurmMapGen.data = {
-		config: null,
-		
-		deeds: null,
-		guardtowers: null,
-		structures: null
-	};
-	
+	WurmMapGen.config = null;
+
+	WurmMapGen.deeds = null;
+	WurmMapGen.guardtowers = null;
+	WurmMapGen.structures = null;
+
 	// Helper function to fetch a dataset from a JSON file
 	function fetchData(key) {
 		return fetch('data/' + key + '.json')
 			.then(function(response) { return response.json() })
 			.then(function(responseData) {
-				WurmMapGen.data[key] = responseData[key];
+				WurmMapGen[key] = responseData[key];
 				return Promise.resolve();
 			});
 	}
-	
+
 	// Load data
 	Promise.all([
 		fetchData('config'),
@@ -34,8 +32,8 @@
 	})
 	.then(function() {
 		// Add computed config values
-		WurmMapGen.data.config.xyMulitiplier = (WurmMapGen.data.config.actualMapSize / 256);
-		
+		WurmMapGen.config.xyMulitiplier = (WurmMapGen.config.actualMapSize / 256);
+
 		// Create the map
 		WurmMapGen.map.create();
 	});
