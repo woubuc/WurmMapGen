@@ -27,6 +27,7 @@ public class MapBuilder {
 	public final static FileManager fileManager = new FileManager();
 	public final static DBHandler dbhandler = new DBHandler();
 	
+	private final static TemplateHandler templateHandler = new TemplateHandler();
 	private final static FileGen fileGenerator = new FileGen();
 
 	public static MeshIO map;
@@ -35,16 +36,24 @@ public class MapBuilder {
 		if (!propertiesManager.load()) {
 			return;
 		}
+		
 		fileManager.load();
 		fileManager.makeTempCopies();
 		fileManager.relocateFileVars();
+		
 		map = MeshIO.open(fileManager.map_topLayer.getAbsolutePath());
+		
 		dbhandler.load();
+		
 		System.out.println("Starting map generation...");
 		start();
-		fileManager.copyTemplate();
+		
+		templateHandler.copyAssets();
+		templateHandler.render();
+		
 		fileGenerator.generateFiles();
 		dbhandler.closeConnections();
+		
 		map.close();
 		System.out.println("Removing temporary files...");
 		fileManager.deleteDir(new File(propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp"));

@@ -35,7 +35,6 @@ public class FileManager {
 	public File db_wurmPlayers = null;
 	
 	File[] fileBackupArray = null;
-	private final File templateDirectory = new File("./template");
 	
 	public void load() {
 		map_topLayer = new File(MapBuilder.propertiesManager.wurmMapLocation.getAbsolutePath() + separator + "top_layer.map");
@@ -66,24 +65,7 @@ public class FileManager {
 		writer.write(null, new IIOImage( newImg, null, null ), param);
 	}
 	
-	public void copy(InputStream source , String destination) {
-        try {
-            Files.copy(source, Paths.get(destination), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ex) {
-        	ex.printStackTrace();
-        }
-    }
 	
-	/**
-	 * Copies the html, css and js template files from the /template directory located next to the .jar
-	 * into the output directory.
-	 */
-	public void copyTemplate() throws IOException {
-		System.out.println("Template files");
-		FileUtils.copyDirectory(templateDirectory, new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath()));
-		System.out.println("    OK template files copied");
-		System.out.println();
-	}
 	
 	@SuppressWarnings("resource")
 	public void copyFile(File sourceFile, File destFile) throws IOException {

@@ -6,7 +6,7 @@
 	// Prepare arrays for loaded data
 	WurmMapGen.config = null;
 
-	WurmMapGen.deeds = null;
+	WurmMapGen.villages = null;
 	WurmMapGen.guardtowers = null;
 	WurmMapGen.structures = null;
 
@@ -23,11 +23,12 @@
 	// Load data
 	Promise.all([
 		fetchData('config'),
-		fetchData('deeds'),
+		fetchData('villages'),
 		fetchData('guardtowers'),
 		fetchData('structures')
 	])
 	.catch(function(err) {
+		console.error(err);
 		document.write('Something went wrong, map data could not be loaded'); // TODO add better error handling
 	})
 	.then(function() {

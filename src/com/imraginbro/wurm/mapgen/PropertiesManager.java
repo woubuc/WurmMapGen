@@ -10,6 +10,8 @@ import com.imraginbro.wurm.mapgen.MapBuilder;
 
 public class PropertiesManager {
 	
+	public String serverName = "";
+	
 	public Boolean showDeeds = true;
 	public Boolean showGuardTowers = true;
 	public Boolean showStructures = true;
@@ -58,6 +60,8 @@ public class PropertiesManager {
 		
 		System.out.println("      map location: " + mapLocation);
 		System.out.println("      save location: " + saveLocation);
+		
+		this.serverName = properties.getProperty("serverName");
 		
 		this.showDeeds = Boolean.parseBoolean(properties.getProperty("showDeeds", Boolean.toString(this.showDeeds)));
 		this.showGuardTowers = Boolean.parseBoolean(properties.getProperty("showGuardTowers", Boolean.toString(this.showGuardTowers)));

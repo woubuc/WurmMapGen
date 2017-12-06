@@ -19,7 +19,7 @@ public class FileGen {
 		ConfigFileGen.generateConfigFile(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "config.json").toString());
 		
 		if (MapBuilder.propertiesManager.showDeeds) {
-			villageFileGen.generateVillageFile(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "deeds.json").toString());
+			villageFileGen.generateVillageFile(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "villages.json").toString());
 		}
 		
 		if (MapBuilder.propertiesManager.showStructures) {

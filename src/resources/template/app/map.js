@@ -25,6 +25,7 @@ WurmMapGen.map = {
 			map.unproject([config.maxMapSize, 0], config.mapMaxZoom));
 
 		map.fitBounds(mapBounds);
+        map.setZoom(Math.ceil((config.mapMinZoom + config.mapMaxZoom) / 2) - 1);
 
 		var wurmMapLayer = L.tileLayer('images/{x}-{y}.png', {
 			maxNativeZoom: config.nativeZoom,
@@ -38,40 +39,40 @@ WurmMapGen.map = {
 		}).addTo(map);
 
 		// Create layer groups
-		var deedBorders = L.layerGroup();
-		var deedMarkers = L.layerGroup();
+		var villageBorders = L.layerGroup();
+		var villageMarkers = L.layerGroup();
 		var guardtowerBorders = L.layerGroup();
 		var guardtowerMarkers = L.layerGroup();
 		var structureBorders = L.layerGroup();
 		var playerMarkers = L.layerGroup();
 
-		// Add deeds
-		for (var i = 0; i < WurmMapGen.deeds.length; i++) {
-			var deed = WurmMapGen.deeds[i];
+		// Add villages
+		for (var i = 0; i < WurmMapGen.villages.length; i++) {
+			var village = WurmMapGen.villages[i];
 
-			// Create polygon based on deed border data
+			// Create polygon based on village border data
 			var border = L.polygon([
-				xy(deed.borders[0], deed.borders[1]),
-				xy(deed.borders[2], deed.borders[1]),
-				xy(deed.borders[2], deed.borders[3]),
-				xy(deed.borders[0], deed.borders[3])
+				xy(village.borders[0], village.borders[1]),
+				xy(village.borders[2], village.borders[1]),
+				xy(village.borders[2], village.borders[3]),
+				xy(village.borders[0], village.borders[3])
 			], {
-				color: (deed.permanent ? 'orange' : 'white'),
+				color: (village.permanent ? 'orange' : 'white'),
 				fillOpacity: 0,
 				weight: 1
 			});
 
-			var marker = L.marker(xy(deed.x, deed.y),
-				{icon: WurmMapGen.markers[deed.permanent ? 'main' : 'letter_' + deed.name.charAt(0)]}
+			var marker = L.marker(xy(village.x, village.y),
+				{icon: WurmMapGen.markers[village.permanent ? 'main' : 'letter_' + village.name.charAt(0)]}
 			);
 
-			marker.bindPopup('<div align="center"><b>' + deed.name + '</b><br><i>' + deed.motto + '</i></div><br><b>Mayor:</b> ' + deed.mayor + '<br><b>Citizens:</b> ' + deed.citizens + '');
+			marker.bindPopup('<div align="center"><b>' + village.name + '</b><br><i>' + village.motto + '</i></div><br><b>Mayor:</b> ' + village.mayor + '<br><b>Citizens:</b> ' + village.citizens + '');
 
 			// Open the marker popup when the border is clicked
 			border.on('click', function() { marker.openPopup(); });
 
-			deedBorders.addLayer(border);
-			deedMarkers.addLayer(marker);
+			villageBorders.addLayer(border);
+			villageMarkers.addLayer(marker);
 		}
 
 		// Add guard towers
@@ -90,11 +91,11 @@ WurmMapGen.map = {
 				weight: 1
 			});
 
-			var marker = L.marker(xy(deed.x, deed.y),
+			var marker = L.marker(xy(tower.x, tower.y),
 				{icon: WurmMapGen.markers.guardtower}
 			);
 
-			marker.bindPopup('<div align="center"><b>' + deed.name + '</b><br><i>' + deed.motto + '</i></div><br><b>Mayor:</b> ' + deed.mayor + '<br><b>Citizens:</b> ' + deed.citizens + '');
+			marker.bindPopup('<div align="center"><b>Guard Tower</b><br><i>Created by ' + tower.creator + '</i></div><br><b>QL:</b> ' + tower.ql + '<br><b>DMG:</b> ' + tower.dmg + '');
 
 			// Open the marker popup when the border is clicked
 			border.on('click', function() { marker.openPopup(); });
@@ -125,8 +126,8 @@ WurmMapGen.map = {
 		}
 
 		// Add layers to map
-		deedBorders.addTo(map);
-		deedMarkers.addTo(map);
+		villageBorders.addTo(map);
+		villageMarkers.addTo(map);
 		guardtowerBorders.addTo(map);
 		guardtowerMarkers.addTo(map);
 		structureBorders.addTo(map);
@@ -136,8 +137,8 @@ WurmMapGen.map = {
 		var overlayData = {
 			"Player Markers": playerMarkers,
 			"Structure Borders": structureBorders,
-			"Deed Borders": deedBorders,
-			"Deed Markers": deedMarkers,
+			"Deed Borders": villageBorders,
+			"Deed Markers": villageMarkers,
 			"Guard Tower Markers": guardtowerMarkers,
 			"Guard Tower Borders": guardtowerBorders
 		};
