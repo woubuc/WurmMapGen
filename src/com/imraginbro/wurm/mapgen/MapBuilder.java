@@ -22,11 +22,12 @@ public class MapBuilder {
 	private final String separator = File.separator;
 	private int threadCounter = 0;
 	private int bridgeTileCount = 0;
-
-	public final static FileManager fileManager = new FileManager();
+	
 	public final static PropertiesManager propertiesManager = new PropertiesManager();
-	public final static FileGen fileGenerator = new FileGen();
+	public final static FileManager fileManager = new FileManager();
 	public final static DBHandler dbhandler = new DBHandler();
+	
+	private final static FileGen fileGenerator = new FileGen();
 
 	public static MeshIO map;
 

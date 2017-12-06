@@ -5,8 +5,6 @@ import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.sql.SQLException;
 
 public class ConfigFileGen {
 	

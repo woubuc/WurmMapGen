@@ -4,7 +4,6 @@ import com.imraginbro.wurm.mapgen.MapBuilder;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import javax.swing.plaf.nimbus.State;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
