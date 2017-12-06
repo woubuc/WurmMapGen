@@ -51,11 +51,11 @@ public class ConfigFileGen {
 		
 		configObject.put("config", config);
 		
-		if (MapBuilder.propertiesManager.verbose) System.out.println("       creating data/config.json");
+		if (MapBuilder.propertiesManager.verbose) System.out.println("      creating data/config.json");
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(configObject.toJSONString());
 		writer.close();
 		
-		System.out.println("    OK wrote config data to config.json");
+		System.out.println("   OK wrote config data to config.json");
 	}
 }

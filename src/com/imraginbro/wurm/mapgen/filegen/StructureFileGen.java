@@ -143,10 +143,10 @@ public class StructureFileGen {
 		 */
 		private void populateOwnerName() {
 			try (Statement statement = MapBuilder.dbhandler.getPlayersConnection().createStatement();
-				 ResultSet result = statement.executeQuery("SELECT NAME FROM PLAYERS WHERE WURMID='"+this.ownerID+"';")) {
+				 ResultSet resultSet = statement.executeQuery("SELECT NAME FROM PLAYERS WHERE WURMID='"+this.ownerID+"';")) {
 				
-				if (result.next()) {
-					this.ownerName = result.getString("NAME");
+				if (resultSet.next()) {
+					this.ownerName = resultSet.getString("NAME");
 				}
 			} catch(SQLException e) {
 				System.out.println("ERROR " + e.getMessage());

@@ -2,11 +2,8 @@ package com.imraginbro.wurm.mapgen;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import com.imraginbro.wurm.mapgen.MapBuilder;
 
 public class PropertiesManager {
 	
