@@ -49,6 +49,10 @@ public class ConfigFileGen {
 		config.put("actualMapSize", mapSize);
 		config.put("maxMapSize", maxMapSize);
 		
+		config.put("showDeeds", MapBuilder.propertiesManager.showDeeds);
+		config.put("showGuardTowers", MapBuilder.propertiesManager.showGuardTowers);
+		config.put("showStructures", MapBuilder.propertiesManager.showStructures);
+		
 		configObject.put("config", config);
 		
 		if (MapBuilder.propertiesManager.verbose) System.out.println("      creating data/config.json");
