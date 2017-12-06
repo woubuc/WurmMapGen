@@ -4,25 +4,28 @@
 	<title>WU MapGen</title>
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
-
+	
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha384-vE+16m4967W2kZS6iZkYOqJ4lwBlnVTEkYhdn4pC+hehUp4OSRYDA9Luwc3FLGW5" crossorigin="anonymous">
 	<link rel="stylesheet" href="dist/Leaflet.Coordinates-0.1.5.css">
 	<link rel="stylesheet" href="style.css">
 
-	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha384-ic4t376ZLdSPIUOxDpNXqU0UWe1c/2BkOXxiirQWAgKZzMJ6njfS1jdzbyMJbfil" crossorigin="anonymous"></script>
-	<script type="text/javascript" src="dist/Leaflet.Coordinates-0.1.5.min.js"></script>
+	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" defer integrity="sha384-ic4t376ZLdSPIUOxDpNXqU0UWe1c/2BkOXxiirQWAgKZzMJ6njfS1jdzbyMJbfil" crossorigin="anonymous"></script>
+	<script src="dist/Leaflet.Coordinates-0.1.5.min.js" defer></script>
+	
+	<script src="https://unpkg.com/whatwg-fetch@2.0.3/fetch.js" defer integrity="sha384-KaKx4aJnrltBb2dne61B/MRPA4uRfQvv6YW99RgjHax8TRjFxcC4BC19EEX0te/6" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/promise-polyfill@6.1.0/promise.min.js" defer integrity="sha384-LSmcy/rdMAgofokne7lmSBxJnXdRcj4SKZwPD+CE8At+QhWXRPvESLzhy/N2zHX+" crossorigin="anonymous"></script>
 
-	<script type="text/javascript" src="includes/config.js"></script>
-	<script type="text/javascript" src="includes/markers.js"></script>
-	<script type="text/javascript" src="includes/deeds.js"></script>
-	<script type="text/javascript" src="includes/players.js"></script>
-	<script type="text/javascript" src="includes/structures.js"></script>
-	<script type="text/javascript" src="includes/guardtowers.js"></script>
-
-	<script type="text/javascript" src="app.js"></script>
-
+	<script src="includes/config.js" defer></script>
+	<script src="includes/markers.js" defer></script>
+	<script src="includes/players.js" defer></script>
 </head>
-<body onload="init()">
-<div id="map"></div>
+<body>
+	<div id="map"></div>
+	
+	<script>window.WurmMapGen = {}; // Create a namespace for the app</script>
+	<script type="text/javascript" defer src="app/util.js"></script>
+	<script type="text/javascript" defer src="app/markers.js"></script>
+	<script type="text/javascript" defer src="app/map.js"></script>
+	<script type="text/javascript" defer src="app/main.js"></script>
 </body>
 </html>
