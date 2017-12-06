@@ -1,6 +1,8 @@
 # WurmMapGen
 Wurm Unlimited interactive tile map generator
 
+**Under active development**
+
 ## Installation
 1. Download the latest release from the [releases page](https://github.com/woubuc/WurmMapGen/releases)
 2. Unpack the downloaded archive
