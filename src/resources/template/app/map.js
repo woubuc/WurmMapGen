@@ -39,12 +39,13 @@ WurmMapGen.map = {
 		}).addTo(map);
 
 		// Create layer groups
-		var villageBorders = L.layerGroup();
-		var villageMarkers = L.layerGroup();
-		var guardtowerBorders = L.layerGroup();
-		var guardtowerMarkers = L.layerGroup();
-		var structureBorders = L.layerGroup();
-		var playerMarkers = L.layerGroup();
+		WurmMapGen.map.layers = {};
+		var villageBorders = WurmMapGen.map.layers.villageBorders = L.layerGroup();
+		var villageMarkers = WurmMapGen.map.layers.villageMarkers = L.layerGroup();
+		var guardtowerBorders = WurmMapGen.map.layers.guardtowerBorders = L.layerGroup();
+		var guardtowerMarkers = WurmMapGen.map.layers.guardtowerMarkers = L.layerGroup();
+		var structureBorders = WurmMapGen.map.layers.structureBorders = L.layerGroup();
+		var playerMarkers = WurmMapGen.map.layers.playerMarkers = L.layerGroup();
 
 		// Add villages
 		for (var i = 0; i < WurmMapGen.villages.length; i++) {
@@ -133,18 +134,6 @@ WurmMapGen.map = {
 		structureBorders.addTo(map);
 		playerMarkers.addTo(map);
 
-        // Add overlay control
-		var overlayData = {
-			"Player Markers": playerMarkers,
-			"Structure Borders": structureBorders,
-			"Deed Borders": villageBorders,
-			"Deed Markers": villageMarkers,
-			"Guard Tower Markers": guardtowerMarkers,
-			"Guard Tower Borders": guardtowerBorders
-		};
-
-		L.control.layers(null, overlayData).addTo(map);
-
 		// Add coordinates display
 		L.control.coordinates({
 			position:"bottomleft",
@@ -152,11 +141,11 @@ WurmMapGen.map = {
 				if (e < 0) {
 					e = ((180 + e) + 180);
 				}
-				return Math.floor(e * xyMulitiplier)+" x,"
-				},
+				return Math.floor(e * config.xyMulitiplier) + ' x,';
+			},
 			labelFormatterLat : function(e){
-				return Math.floor((-e)*xyMulitiplier)+" y"
-				}
+				return Math.floor((-e) * config.xyMulitiplier) + ' y';
+			}
 		}).addTo(map);
 	}
 };
