@@ -25,8 +25,6 @@ public class PropertiesManager {
 	public Boolean gen_map_water = true;
 	public Boolean gen_map_bridges = true;
 	
-	public Boolean replaceFiles = true;
-	
 	public File wurmMapLocation;
 	public File saveLocation;
 	
@@ -81,8 +79,6 @@ public class PropertiesManager {
 		
 		this.wurmMapLocation = new File(mapLocation);
 		this.saveLocation = new File(saveLocation);
-		
-		this.replaceFiles = Boolean.parseBoolean(properties.getProperty("replaceFiles", Boolean.toString(this.replaceFiles)));
 
 		return true;
 	}
