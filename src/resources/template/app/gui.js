@@ -9,6 +9,8 @@ WurmMapGen.gui = new Vue({
 		sidebarVisible: (window.innerWidth > 1200),
 		loaded: false,
 
+		searchQuery: '',
+
 		playerCount: 0,
 
 		showStructures: true,
@@ -24,6 +26,79 @@ WurmMapGen.gui = new Vue({
 	computed: {
 		playerCountLabel: function() {
 			return (this.playerCount === 1 ? '1 player online' : this.playerCount + ' players online');
+		},
+
+		searchResultsOpen: function() {
+			return (this.searchResults.length > 0);
+		},
+
+		searchResults: function() {
+			// Return empty results if no search query is given
+			if (this.searchQuery.length < 1) {
+				return [];
+			}
+
+			var escapeHtml = WurmMapGen.util.escapeHtml;
+
+			var query = this.searchQuery.toLowerCase();
+			var results = [];
+			var i, index;
+
+			// Find online players who match the search query
+			if (WurmMapGen.players) {
+				for (i = 0; i < WurmMapGen.players.length; i++) {
+					var player = WurmMapGen.players[i];
+
+					var name = escapeHtml(player.name);
+
+					if ((index = name.toLowerCase().indexOf(query)) > -1) {
+						results.push({
+							type: 'player',
+							x: player.x,
+							y: player.y,
+							label: '<p>' + name.slice(0, index) + '<strong>' + name.slice(index, index + query.length) + '</strong>' + name.slice(index + query.length) + '</p>'
+						});
+					}
+
+					if (results.length >= 8) {
+						break;
+					}
+				}
+
+				if (results.length >= 8) {
+					return results;
+				}
+			}
+
+			// Find villages that match the search query
+			for (i = 0; i < WurmMapGen.villages.length; i++) {
+				var village = WurmMapGen.villages[i];
+
+				var name = escapeHtml(village.name);
+				var mayor = escapeHtml(village.mayor);
+
+				if ((index = name.toLowerCase().indexOf(query)) > -1) {
+					results.push({
+						type: 'village',
+						x: village.x,
+						y: village.y,
+						label: '<p>' + name.slice(0, index) + '<strong>' + name.slice(index, index + query.length) + '</strong>' + name.slice(index + query.length) + '</p><p class="small">Mayor: ' + mayor + '</p>'
+					});
+				} else if ((index = mayor.toLowerCase().indexOf(query)) > -1) {
+					results.push({
+						type: 'village',
+						x: village.x,
+						y: village.y,
+						label: '<p>' + name + '</p><p class="small">Mayor: ' + mayor.slice(0, index) + '<strong>' + mayor.slice(index, index + query.length) + '</strong>' + mayor.slice(index + query.length) + '</p>'
+					});
+				}
+
+				if (results.length >= 8) {
+					break;
+				}
+			}
+
+			return results;
 		}
 	},
 
@@ -78,6 +153,10 @@ WurmMapGen.gui = new Vue({
 		 * application has been loaded and initialised.
 		 */
 		init: function() {
+			if (WurmMapGen.players) {
+				this.playerCount = WurmMapGen.players.length;
+			}
+
 			this.showStructures = WurmMapGen.util.getConfig('structureBorders', true);
 
 			this.showVillages = WurmMapGen.util.getConfig('villageMarkers', true);
@@ -87,6 +166,16 @@ WurmMapGen.gui = new Vue({
 			this.showTowerBorders = WurmMapGen.util.getConfig('guardtowerBorders', false);
 
 			this.loaded = true;
+		},
+
+		/**
+		 * Focuses the map on coordinates
+		 *
+		 * @param  {number}  x  The x coordinate
+		 * @param  {number}  y  The y coordinate
+		 */
+		focusMap: function(x, y) {
+			WurmMapGen.map.map.setView(WurmMapGen.util.xy(x, y), WurmMapGen.config.mapMaxZoom - 1);
 		},
 
 		/**

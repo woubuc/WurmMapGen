@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,10 +17,9 @@ public class VillageFileGen {
 	
 	/**
 	 * Generates a JSON file containing all villages on the server, and writes it to the given file path.
-	 * @param filePath The destination file
 	 */
 	@SuppressWarnings("unchecked")
-	public void generateVillageFile(String filePath) throws IOException, SQLException {
+	public void generateVillageFile() throws IOException, SQLException {
 		System.out.println();
 		System.out.println("Deeds data");
 		
@@ -83,6 +83,7 @@ public class VillageFileGen {
 		
 		// Write JSON data to file
 		if (MapBuilder.propertiesManager.verbose) System.out.println("      creating data/villages.json");
+		String filePath = Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "villages.json").toString();
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();

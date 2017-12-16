@@ -12,6 +12,7 @@ WurmMapGen.map = {
 	create: function() {
 		var config = WurmMapGen.config;
 		var xy = WurmMapGen.util.xy;
+		var escapeHtml = WurmMapGen.util.escapeHtml;
 
 		// Set up the map
 		var map = WurmMapGen.map.map = L.map('map', {
@@ -70,7 +71,12 @@ WurmMapGen.map = {
 				{icon: WurmMapGen.markers[village.permanent ? 'main' : 'letter_' + village.name.charAt(0)]}
 			);
 
-			marker.bindPopup('<div align="center"><b>' + village.name + '</b><br><i>' + village.motto + '</i></div><br><b>Mayor:</b> ' + village.mayor + '<br><b>Citizens:</b> ' + village.citizens + '');
+			marker.bindPopup([
+				'<div align="center"><b>' + escapeHtml(village.name) + '</b>',
+				'<i>' + escapeHtml(village.motto) + '</i></div>',
+				'<b>Mayor:</b> ' + escapeHtml(village.mayor),
+				'<b>Citizens:</b> ' + escapeHtml(village.citizens)
+				].join('<br>'));
 
 			// Open the marker popup when the border is clicked
 			border.on('click', function() { marker.openPopup(); });
@@ -99,7 +105,12 @@ WurmMapGen.map = {
 				{icon: WurmMapGen.markers.guardtower}
 			);
 
-			marker.bindPopup('<div align="center"><b>Guard Tower</b><br><i>Created by ' + tower.creator + '</i></div><br><b>QL:</b> ' + tower.ql + '<br><b>DMG:</b> ' + tower.dmg + '');
+			marker.bindPopup([
+				'<div align="center"><b>Guard Tower</b>',
+				'<i>Created by ' + escapeHtml(tower.creator) + '</i></div>',
+				'<b>QL:</b> ' + escapeHtml(tower.ql),
+				'<b>DMG:</b> ' + escapeHtml(tower.dmg)
+				].join('<br>'));
 
 			// Open the marker popup when the border is clicked
 			border.on('click', function() { marker.openPopup(); });
@@ -124,7 +135,10 @@ WurmMapGen.map = {
 				weight: 1
 			});
 
-			border.bindPopup('<div align="center"><b>' + structure.getStructureName() + '</b><br><i>Created by ' + structure.getOwnerName() + '</i></div>');
+			border.bindPopup([
+				'<div align="center"><b>' + escapeHtml(structure.getStructureName()) + '</b>',
+				'<i>Created by ' + escapeHtml(structure.getOwnerName()) + '</i></div>'
+				].join('<br>'));
 
 			structureBorders.addLayer(border);
 		}
@@ -160,6 +174,8 @@ WurmMapGen.map = {
 	 * WurmMapGen.players from the RMI interface.
 	 */
 	updatePlayerMarkers: function() {
+		if (!WurmMapGen.players) { return; }
+
 		// Timestamp to keep track of which players were updated
 		var timestamp = Date.now();
 
@@ -172,7 +188,7 @@ WurmMapGen.map = {
 
 				// Create new marker if one does not exist yet
 				marker.marker = L.marker(WurmMapGen.util.xy(player.x, player.y), {icon: WurmMapGen.markers.player});
-				marker.marker.bindPopup('<div align="center"><b>' + player.name + '</b></div>');
+				marker.marker.bindPopup('<div align="center"><b>' + WurmMapGen.util.escapeHtml(player.name) + '</b></div>');
 
 				// Add player ID to marker IDs array for efficient iteration
 				WurmMapGen.map.playerMarkerIds.push(player.id);

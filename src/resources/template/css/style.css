@@ -3,7 +3,7 @@
 body { font-family:'Roboto', sans-serif; font-weight:400; font-size:14px; color:#444; }
 
 /* Prevent text selection when toggling options */
-* { -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; -o-user-select:none; user-select:none;
+#sidebar, #sidebar-toggle { -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; -o-user-select:none; user-select:none;
 	-webkit-tap-highlight-color:transparent; -moz-tap-highlight-color:transparent; tap-highlight-color:transparent; }
 
 /* Link styles */
@@ -21,26 +21,28 @@ a:hover, a:focus { color:#2196F3; }
 .z-overlay { z-index:2; }
 
 /* Text */
-h1 { padding:10px 0; font-size:14px; font-weight:500; }
+h1 { font-size:14px; font-weight:700; }
+#playercount { font-size:12px; color:#888; }
 label { display:block; padding:10px 0; cursor:pointer; }
 
 /* Basic GUI elements */
 #sidebar { height:100vh; width:240px; left:-240px; background:white; }
-#sidebar-toggle { left:0; top:10px; background:white; padding:8px 14px;
-	border-radius:0 3px 3px 0; box-shadow:0 0 5px rgba(0,0,0,0.1);
-	font-size:20px; cursor:pointer; }
+#sidebar-toggle { left:0; top:10px; width:40px; height:44px; line-height:43px;
+	background:white;  border-radius:0 3px 3px 0; box-shadow:0 0 5px rgba(0,0,0,0.1);
+	font-size:20px; text-align:center; cursor:pointer; }
+
 #map { width:100vw; height:100vh; }
 
 /* GUI elements when collapsible sidebar is open */
 #gui.sidebar #sidebar { left:0; box-shadow:0 0 5px rgba(0,0,0,0.1); }
 #gui.sidebar #sidebar-toggle { left:240px; }
+#gui.sidebar #search { left:290px; }
 #gui.sidebar #map { width:calc(100vw - 240px); left:240px; }
 
 /* Sidebar content */
 #sidebar .block { display:none; border-bottom:1px solid #ddd; padding:10px 15px; }
+#sidebar .block.padding { padding:20px 15px; }
 #sidebar.loaded .block { display:block; }
-
-#sidebar #playercount { margin-top:-10px; font-size:13px; color:#888; }
 
 #sidebar label:hover, #sidebar label:focus { color:#2196F3; }
 #sidebar input { -moz-appearance:none; -webkit-appearance:none; appearance:none;
@@ -54,6 +56,21 @@ label { display:block; padding:10px 0; cursor:pointer; }
 #sidebar label.indent input::after { display:none; }
 
 #sidebar label.inactive { opacity:0.6; }
+
+/* Search box */
+#search { top:10px; left:50px; }
+#search input { display:block; width:300px; height:44px; line-height:44px; padding: 0 12px;
+ 	background:white; border:none; border-radius:3px; box-shadow:0 0 5px rgba(0,0,0,0.1);
+	font-family:'Roboto',sans-serif; font-weight:400; font-size:13px; }
+#search.open input { border-radius:3px 3px 0 0; }
+
+#search-results { display:none; }
+#search.open #search-results { display:block; background:white; border-radius:0 0 3px 3px; }
+
+#search-results div { display:block; padding:8px 12px; text-decoration:none; color:#444; border-top:1px solid #eee; }
+#search-results div:hover { background:#eee; border-radius:3px; }
+#search-results div p strong { font-weight:700; }
+#search-results div p.small { font-size:12px; color:#888; }
 
 /* Disable anti-aliasing on map tiles to improve rendering and scroll speed
  * This needs some different hacks and prefixes to work in every browser

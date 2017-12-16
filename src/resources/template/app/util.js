@@ -7,10 +7,19 @@ WurmMapGen.util = {
 	},
 
 	/**
+	 * Replaces HTML open & close tags with their corresponding entities, to avoid HTML code injection through names
+	 * @param  {string}  unescaped  The unescaped string
+	 * @returns  {string}  The escaped string
+	 */
+	escapeHtml: function(unescaped) {
+		if (typeof unescaped !== 'string') { return unescaped; }
+		return unescaped.replace(/(<)/g, '&lt;').replace(/(>)/g, '&gt');
+	},
+
+	/**
 	 * Gets a boolean value from a settings cookie
 	 * @param  {string}   key           The key of the setting
-	 * @param  {boolean}  defaultValue  Value to return if there is no
-	 *                                  setting of this name
+	 * @param  {boolean}  defaultValue  Value to return if there is no setting of this name
 	 *
 	 * @returns  {boolean}  The boolean value associated with the cookie
 	 */

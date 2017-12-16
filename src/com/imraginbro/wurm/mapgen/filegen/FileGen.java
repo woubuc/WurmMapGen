@@ -20,7 +20,7 @@ public class FileGen {
 		ConfigFileGen.generatePhpConfigFile();
 		
 		if (MapBuilder.propertiesManager.showDeeds) {
-			villageFileGen.generateVillageFile(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "villages.json").toString());
+			villageFileGen.generateVillageFile();
 		}
 		
 		if (MapBuilder.propertiesManager.showStructures) {

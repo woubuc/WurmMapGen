@@ -69,7 +69,6 @@ Promise.all(promises)
 	WurmMapGen.map.create();
 
 	// Initialise the GUI
-	WurmMapGen.gui.updatePlayerCount();
 	WurmMapGen.gui.init();
 
 	// Set interval to refresh realtime data

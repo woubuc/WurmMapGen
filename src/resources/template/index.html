@@ -6,7 +6,7 @@
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
 
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700">
 	<link rel="stylesheet" href="dist/Leaflet.Coordinates-0.1.5.css">
 	<link rel="stylesheet" href="css/style.css">
 </head>
@@ -16,7 +16,7 @@
 <div id="gui" :class="{sidebar: sidebarVisible}">
 	<a id="sidebar-toggle" class="absolute transition z-gui" @click="sidebarVisible = !sidebarVisible">&#8801;</a>
 	<div id="sidebar" class="absolute transition z-gui" :class="{loaded: loaded}">
-		<div class="block">
+		<div class="block padding">
 			<h1>{{serverName}}</h1>
 
 			{{#enableRealtimeMarkers}}
@@ -70,8 +70,11 @@
 
 	</div>
 
-	<div id="search" class="absolute transition z-gui">
-
+	<div id="search" class="absolute transition z-gui" :class="{open: searchResultsOpen}">
+		<input v-model="searchQuery" placeholder="Search map for deeds, players, ..." autocomplete="off">
+		<div id="search-results" v-if="searchQuery !== ''">
+			<div v-for="result in searchResults" v-html="result.label" @click="focusMap(result.x, result.y); searchQuery = '';"></div>
+		</div>
 	</div>
 
 	<!-- Map container -->
