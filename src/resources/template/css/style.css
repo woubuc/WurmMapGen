@@ -40,6 +40,8 @@ label { display:block; padding:10px 0; cursor:pointer; }
 #sidebar .block { display:none; border-bottom:1px solid #ddd; padding:10px 15px; }
 #sidebar.loaded .block { display:block; }
 
+#sidebar #playercount { margin-top:-10px; font-size:13px; color:#888; }
+
 #sidebar label:hover, #sidebar label:focus { color:#2196F3; }
 #sidebar input { -moz-appearance:none; -webkit-appearance:none; appearance:none;
 	display:block; width:16px; height:16px; margin-right:5px; border-radius:8px; border:2px solid #ddd;

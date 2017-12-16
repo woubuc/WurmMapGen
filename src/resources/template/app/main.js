@@ -36,6 +36,7 @@ function setRealtimeTimer() {
 	WurmMapGen.realtimeTimer = setTimeout(function() {
 		fetchData('players', 'players.php').then(function() {
 			WurmMapGen.map.updatePlayerMarkers();
+			WurmMapGen.gui.playerCount = WurmMapGen.players.length;
 			setRealtimeTimer();
 		});
 	}, time);
@@ -68,6 +69,7 @@ Promise.all(promises)
 	WurmMapGen.map.create();
 
 	// Initialise the GUI
+	WurmMapGen.gui.updatePlayerCount();
 	WurmMapGen.gui.init();
 
 	// Set interval to refresh realtime data

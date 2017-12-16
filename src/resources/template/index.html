@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500">
 	<link rel="stylesheet" href="dist/Leaflet.Coordinates-0.1.5.css">
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="css/style.css">
 </head>
 <body data-realtime="{{enableRealtimeMarkers}}">
 
@@ -18,6 +18,10 @@
 	<div id="sidebar" class="absolute transition z-gui" :class="{loaded: loaded}">
 		<div class="block">
 			<h1>{{serverName}}</h1>
+
+			{{#enableRealtimeMarkers}}
+			<div id="playercount" v-text="playerCountLabel"></div>
+			{{/enableRealtimeMarkers}}
 		</div>
 
 		{{#enableRealtimeMarkers}}

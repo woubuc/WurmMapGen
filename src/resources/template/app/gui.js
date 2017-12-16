@@ -9,6 +9,8 @@ WurmMapGen.gui = new Vue({
 		sidebarVisible: (window.innerWidth > 1200),
 		loaded: false,
 
+		playerCount: 0,
+
 		showStructures: true,
 		showPlayers: true,
 
@@ -17,6 +19,12 @@ WurmMapGen.gui = new Vue({
 
 		showTowers: true,
 		showTowerBorders: true
+	},
+
+	computed: {
+		playerCountLabel: function() {
+			return (this.playerCount === 1 ? '1 player online' : this.playerCount + ' players online');
+		}
 	},
 
 	watch: {
