@@ -1,5 +1,7 @@
 <?php
 
+require_once('config.php');
+
 class WurmRMI {
 
 	private $host;
@@ -7,13 +9,13 @@ class WurmRMI {
 
 	/**
 	 * Creates a new RMI connection
-	 *
-	 * @param  string  $host  The hostname to connect to
-	 * @param  string  $port  The port to connect to
 	 */
-	public function __construct($host = 'localhost', $port = '8080') {
-		$this->host = $host;
-		$this->port = $port;
+	public function __construct() {
+		global $conf_rmi_host;
+		global $conf_rmi_port;
+
+		$this->host = $conf_rmi_host;
+		$this->port = $conf_rmi_port;
 	}
 
 	/**

@@ -1,19 +1,20 @@
 package com.imraginbro.wurm.mapgen.filegen;
 
 import com.imraginbro.wurm.mapgen.MapBuilder;
+import com.imraginbro.wurm.mapgen.MapGen;
 import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 public class ConfigFileGen {
 	
 	/**
 	 * Generates a config file
-	 * @param filePath The destination file
 	 */
 	@SuppressWarnings("unchecked")
-	public static void generateConfigFile(String filePath) throws IOException {
+	public static void generateConfigFile() throws IOException {
 		System.out.println();
 		System.out.println("Config data");
 		
@@ -56,10 +57,30 @@ public class ConfigFileGen {
 		configObject.put("config", config);
 		
 		if (MapBuilder.propertiesManager.verbose) System.out.println("      creating data/config.json");
+		String filePath = Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "config.json").toString();
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(configObject.toJSONString());
 		writer.close();
 		
 		System.out.println("   OK wrote config data to config.json");
+	}
+	
+	/**
+	 * Generates a config file to be used in the PHP code necessary to connect to the RMI interface
+	 */
+	public static void generatePhpConfigFile() throws IOException {
+		System.out.println();
+		System.out.println("PHP config data");
+		
+		if (MapBuilder.propertiesManager.verbose) System.out.println("      creating includes/config.php");
+		String filePath = Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "includes", "config.php").toString();
+		FileWriter writer = new FileWriter(filePath, false);
+		writer.write(String.format("<?php\n$conf_rmi_host = '%s';\n$conf_rmi_port = '%s';\n?>",
+				MapBuilder.propertiesManager.rmiHost.replace("'", "\\'"),
+				MapBuilder.propertiesManager.rmiPort.replace("'", "\\'")
+		));
+		writer.close();
+		
+		System.out.println("   OK wrote config data to config.php");
 	}
 }

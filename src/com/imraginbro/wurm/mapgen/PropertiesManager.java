@@ -10,6 +10,8 @@ public class PropertiesManager {
 	public String serverName = "";
 	
 	public boolean enableRealtimeMarkers = false;
+	public String rmiHost = "localhost";
+	public String rmiPort = "8080";
 	
 	public boolean showPlayers = true;
 	public Boolean showDeeds = true;
@@ -24,6 +26,7 @@ public class PropertiesManager {
 	public Boolean gen_map_shade_paths = true;
 	public Boolean gen_map_water = true;
 	public Boolean gen_map_bridges = true;
+	
 	
 	public File wurmMapLocation;
 	public File saveLocation;
@@ -62,6 +65,8 @@ public class PropertiesManager {
 		this.serverName = properties.getProperty("serverName");
 		
 		this.enableRealtimeMarkers = Boolean.parseBoolean(properties.getProperty("enableRealtimeMarkers", Boolean.toString(this.enableRealtimeMarkers)));
+		this.rmiHost = properties.getProperty("rmiHost");
+		this.rmiPort = properties.getProperty("rmiPort");
 		
 		this.showPlayers = Boolean.parseBoolean(properties.getProperty("showPlayers", Boolean.toString(this.showPlayers)));
 		this.showDeeds = Boolean.parseBoolean(properties.getProperty("showDeeds", Boolean.toString(this.showDeeds)));

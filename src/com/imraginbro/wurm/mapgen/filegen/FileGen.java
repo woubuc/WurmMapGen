@@ -16,7 +16,8 @@ public class FileGen {
 	 * Generates the required datafiles for the map
 	 */
 	public void generateFiles() throws IOException, SQLException {
-		ConfigFileGen.generateConfigFile(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "config.json").toString());
+		ConfigFileGen.generateConfigFile();
+		ConfigFileGen.generatePhpConfigFile();
 		
 		if (MapBuilder.propertiesManager.showDeeds) {
 			villageFileGen.generateVillageFile(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "villages.json").toString());
