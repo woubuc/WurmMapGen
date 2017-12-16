@@ -41,11 +41,12 @@ public class MapBuilder {
 		fileManager.makeTempCopies();
 		fileManager.relocateFileVars();
 		
+		System.out.println("\nWurm MeshIO operations");
 		map = MeshIO.open(fileManager.map_topLayer.getAbsolutePath());
 		
 		dbhandler.load();
 		
-		System.out.println("Starting map generation...");
+		System.out.println("\nMap generation");
 		start();
 		
 		templateHandler.copyAssets();
@@ -55,8 +56,9 @@ public class MapBuilder {
 		dbhandler.closeConnections();
 		
 		map.close();
-		System.out.println("Removing temporary files...");
+		System.out.println("\nRemove temp files");
 		fileManager.deleteDir(new File(propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp"));
+		System.out.println("   OK Temporary files removed");
 	}
 
 	private void start() {
@@ -74,16 +76,16 @@ public class MapBuilder {
 		Object obj = new Object();
 		while (!executor.isTerminated()) {
 			int percent = (int)((float)(totalProcesses - threadCounter) / (float)(totalProcesses) * 100.0f);
-			System.out.print("Completion percent: " + percent + "%\r");
+			System.out.print("      Completion percent: " + percent + "%\r");
 			try {
 				synchronized (obj) {
 					obj.wait(100);
 				}
 			} catch (InterruptedException ex) { }
 		}
-		System.out.println("Completion percent: 100%");
-		System.out.println("Map generation complete!");
-		System.out.println("Found " + bridgeTileCount + " bridge tiles to draw!");
+		System.out.println("      Completion percent: 100%");
+		if (propertiesManager.verbose) { System.out.println("      Found " + bridgeTileCount + " bridge tiles to draw"); }
+		System.out.println("   OK Map generation complete!");
 	}
 
 	private class MapTileThreader implements Runnable {

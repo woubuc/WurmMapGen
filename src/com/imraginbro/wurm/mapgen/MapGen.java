@@ -3,7 +3,7 @@ package com.imraginbro.wurm.mapgen;
 public class MapGen {
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("WurmMapGen v2.0.0-indev");
+		System.out.println("WurmMapGen");
 		System.out.println("      by garrett92 and woubuc");
 		System.out.println("      more info github.com/garrett92/WurmMapGen");
 		

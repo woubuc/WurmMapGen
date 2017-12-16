@@ -15,7 +15,7 @@ public class TemplateHandler {
 	 * Renders the index.html Pebble template and writes the output to the configured output directory
 	 */
 	public void render() {
-		System.out.println("Template");
+		System.out.println("\nTemplate");
 		
 		try {
 			if (MapBuilder.propertiesManager.verbose) System.out.println("      assembling template data");
@@ -51,7 +51,7 @@ public class TemplateHandler {
 	 * Copies the stylesheets, javascript files and images from the template directory into the output directory.
 	 */
 	public void copyAssets() throws IOException {
-		System.out.println("Template assets");
+		System.out.println("\nTemplate assets");
 		
 		copyAssetsDirectory("app");
 		copyAssetsDirectory("css");
@@ -61,7 +61,6 @@ public class TemplateHandler {
 		copyAssetsDirectory("markers");
 		
 		System.out.println("   OK template asset files copied");
-		System.out.println();
 	}
 	
 	/**

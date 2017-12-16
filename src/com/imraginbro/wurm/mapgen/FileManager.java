@@ -80,13 +80,14 @@ public class FileManager {
 	}
 	
 	public void makeTempCopies() {
+		System.out.println("\nCreate temp copies");
 		new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp").mkdirs();
 		for (int i = 0; i < fileBackupArray.length; i++) {
 			final File old = fileBackupArray[i];
 			if (!old.exists()) {
 				continue;
 			}
-			System.out.println("Creating a temp copy of "+old.getName()+"...");
+			System.out.println("      Creating a temp copy of "+old.getName()+"...");
 			try {
 				copyFile(old, new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + old.getName()));
 			} catch (IOException e) {
@@ -94,6 +95,7 @@ public class FileManager {
 			}
 		}
 		relocateFileVars();
+		System.out.println("   OK Temp copies created");
 	}
 	
 	public void deleteDir(File file) {
