@@ -22,6 +22,9 @@ public class TemplateHandler {
 			
 			Map<String, Object> data = new HashMap<>();
 			data.put("serverName", MapBuilder.propertiesManager.serverName);
+			data.put("enableRealtimeMarkers", MapBuilder.propertiesManager.enableRealtimeMarkers);
+			
+			data.put("showPlayers", MapBuilder.propertiesManager.showPlayers);
 			data.put("showDeeds", MapBuilder.propertiesManager.showDeeds);
 			data.put("showGuardTowers", MapBuilder.propertiesManager.showGuardTowers);
 			data.put("showStructures", MapBuilder.propertiesManager.showStructures);

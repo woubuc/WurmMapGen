@@ -17,7 +17,9 @@ in the Github repository.
 ## Template
 The `index.html` file will be loaded as a [mustache](https://mustache.github.io/mustache.5.html) template. The following template variables are available:
 
-- `{{serverName}}` the name of the server
+- `{{serverName}}` string, the name of the server
+- `{{enableRealtimeMarkers}}` boolean, true if realtime markers are enabled
+- `{{showPlayers}}` boolean, true if players are included on the map
 - `{{showDeeds}}` boolean, true if deeds are included on the map
 - `{{showGuardTowers}}` boolean, true if guard towers are included on the map
 - `{{showStructures}}` boolean, true if structures are included on the map

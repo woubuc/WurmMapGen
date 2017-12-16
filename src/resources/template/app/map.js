@@ -2,6 +2,10 @@
 
 WurmMapGen.map = {
 
+	layers: {},
+	playerMarkers: {},
+	playerMarkerIds: [],
+
 	/**
 	 * Initialises and creates the map interface
 	 */
@@ -39,7 +43,6 @@ WurmMapGen.map = {
 		}).addTo(map);
 
 		// Create layer groups
-		WurmMapGen.map.layers = {};
 		var villageBorders = WurmMapGen.map.layers.villageBorders = L.layerGroup();
 		var villageMarkers = WurmMapGen.map.layers.villageMarkers = L.layerGroup();
 		var guardtowerBorders = WurmMapGen.map.layers.guardtowerBorders = L.layerGroup();
@@ -126,6 +129,9 @@ WurmMapGen.map = {
 			structureBorders.addLayer(border);
 		}
 
+		// Add players
+		WurmMapGen.map.updatePlayerMarkers();
+
 		// Add layers to map
 		villageBorders.addTo(map);
 		villageMarkers.addTo(map);
@@ -147,5 +153,59 @@ WurmMapGen.map = {
 				return Math.floor((-e) * config.xyMulitiplier) + ' y';
 			}
 		}).addTo(map);
+	},
+
+	/**
+	 * Updates the player markers on the map with newly loaded data. Should be called after reloading the data in
+	 * WurmMapGen.players from the RMI interface.
+	 */
+	updatePlayerMarkers: function() {
+		// Timestamp to keep track of which players were updated
+		var timestamp = Date.now();
+
+		for(var i = 0; i < WurmMapGen.players.length; i++) {
+			var player = WurmMapGen.players[i];
+			var marker = WurmMapGen.map.playerMarkers[player.id];
+
+			if (marker === undefined) {
+				WurmMapGen.map.playerMarkers[player.id] = marker = {};
+
+				// Create new marker if one does not exist yet
+				marker.marker = L.marker(WurmMapGen.util.xy(player.x, player.y), {icon: WurmMapGen.markers.player});
+				marker.marker.bindPopup('<div align="center"><b>' + player.name + '</b></div>');
+
+				// Add player ID to marker IDs array for efficient iteration
+				WurmMapGen.map.playerMarkerIds.push(player.id);
+
+				// Add marker to player markers
+				WurmMapGen.map.layers.playerMarkers.addLayer(marker.marker);
+			} else {
+				// Update existing marker position
+				marker.marker.setLatLng(WurmMapGen.util.xy(player.x, player.y));
+			}
+
+			// Set updated timestamp
+			marker.updated = timestamp;
+		}
+
+		// Remove markers from map when the player isn't around anymore
+		var idsToRemove = [];
+		for (var i = 0; i < WurmMapGen.map.playerMarkerIds.length; i++) {
+			var playerId = WurmMapGen.map.playerMarkerIds[i];
+			var marker = WurmMapGen.map.playerMarkers[playerId];
+
+			if (marker.updated !== timestamp) {
+				WurmMapGen.map.layers.playerMarkers.removeLayer(marker.marker);
+				idsToRemove.push(playerId);
+			}
+		}
+
+		// Remove marker data entries
+		for (var i = 0; i < idsToRemove.length; i++) {
+			var playerId = idsToRemove[i];
+
+			delete WurmMapGen.map.playerMarkers[playerId];
+			WurmMapGen.map.playerMarkerIds.splice(WurmMapGen.map.playerMarkerIds.indexOf[playerId], 1);
+		}
 	}
 };

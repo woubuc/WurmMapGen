@@ -10,8 +10,8 @@ WurmMapGen.guardtowers = null;
 WurmMapGen.structures = null;
 
 // Helper function to fetch a dataset from a JSON file
-function fetchData(key) {
-	return fetch('data/' + key + '.json')
+function fetchData(key, path) {
+	return fetch('data/' + path)
 		.then(function(response) { return response.json() })
 		.then(function(responseData) {
 			WurmMapGen[key] = responseData[key];
@@ -19,14 +19,44 @@ function fetchData(key) {
 		});
 }
 
-// Load data
-Promise.all([
-	fetchData('config'),
-	fetchData('villages'),
-	fetchData('guardtowers'),
-	fetchData('structures')
-])
+// Keep track of whether or not the window is focused and active
+var windowIsFocused = true;
+window.onblur = function(){ windowIsFocused = false; }
+window.onfocus = function(){ windowIsFocused = true; }
+
+// Helper function to set timeout for refreshing realtime data
+function setRealtimeTimer() {
+	var time = 30000;
+
+	// If the window is not focused, use 60s refresh timeout instead of 30s
+	if (!windowIsFocused) {
+		time = 60000;
+	}
+
+	WurmMapGen.realtimeTimer = setTimeout(function() {
+		fetchData('players', 'players.php').then(function() {
+			WurmMapGen.map.updatePlayerMarkers();
+			setRealtimeTimer();
+		});
+	}, time);
+}
+
+// Prepare promises to load data
+var promises = [
+	fetchData('config', 'config.json'),
+	fetchData('villages', 'villages.json'),
+	fetchData('guardtowers', 'guardtowers.json'),
+	fetchData('structures', 'structures.json')
+];
+
+if (document.body.getAttribute('data-realtime') === 'true') {
+	promises.push(fetchData('players', 'players.php'));
+}
+
+// Start loading
+Promise.all(promises)
 .catch(function(err) {
+	console.error('Could not load data');
 	console.error(err);
 	document.write('Something went wrong, map data could not be loaded'); // TODO add better error handling
 })
@@ -39,6 +69,11 @@ Promise.all([
 
 	// Initialise the GUI
 	WurmMapGen.gui.init();
+
+	// Set interval to refresh realtime data
+	if (document.body.getAttribute('data-realtime') === 'true') {
+		setRealtimeTimer();
+	}
 });
 
 // End IIFE

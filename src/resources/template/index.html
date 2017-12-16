@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="dist/Leaflet.Coordinates-0.1.5.css">
 	<link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-realtime="{{enableRealtimeMarkers}}">
 
 <!-- Interface elements -->
 <div id="gui" :class="{sidebar: sidebarVisible}">
@@ -19,6 +19,17 @@
 		<div class="block">
 			<h1>{{serverName}}</h1>
 		</div>
+
+		{{#enableRealtimeMarkers}}
+			{{#showPlayers}}
+			<div class="block">
+				<label for="option-show-players" class="flex">
+					<input type="checkbox" class="transition" id="option-show-players" v-model="showPlayers">
+					<span>Show players</span>
+				</label>
+			</div>
+			{{/showPlayers}}
+		{{/enableRealtimeMarkers}}
 
 		{{#showDeeds}}
 		<div class="block">

@@ -9,6 +9,9 @@ public class PropertiesManager {
 	
 	public String serverName = "";
 	
+	public boolean enableRealtimeMarkers = false;
+	
+	public boolean showPlayers = true;
 	public Boolean showDeeds = true;
 	public Boolean showGuardTowers = true;
 	public Boolean showStructures = true;
@@ -60,6 +63,9 @@ public class PropertiesManager {
 		
 		this.serverName = properties.getProperty("serverName");
 		
+		this.enableRealtimeMarkers = Boolean.parseBoolean(properties.getProperty("enableRealtimeMarkers", Boolean.toString(this.enableRealtimeMarkers)));
+		
+		this.showPlayers = Boolean.parseBoolean(properties.getProperty("showPlayers", Boolean.toString(this.showPlayers)));
 		this.showDeeds = Boolean.parseBoolean(properties.getProperty("showDeeds", Boolean.toString(this.showDeeds)));
 		this.showGuardTowers = Boolean.parseBoolean(properties.getProperty("showGuardTowers", Boolean.toString(this.showGuardTowers)));
 		this.showStructures = Boolean.parseBoolean(properties.getProperty("showStructures", Boolean.toString(this.showStructures)));

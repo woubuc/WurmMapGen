@@ -10,6 +10,7 @@ WurmMapGen.gui = new Vue({
 		loaded: false,
 
 		showStructures: true,
+		showPlayers: true,
 
 		showVillages: true,
 		showVillageBorders: true,
@@ -20,8 +21,11 @@ WurmMapGen.gui = new Vue({
 
 	watch: {
 		showStructures: function(value) {
-			this._setMapLayer('structureBorders', value);
-		},
+        	this._setMapLayer('structureBorders', value);
+        },
+		showPlayers: function(value) {
+        	this._setMapLayer('playerMarkers', value);
+        },
 
 		showVillages: function(value) {
 			this._setMapLayer('villageMarkers', value);
@@ -80,8 +84,7 @@ WurmMapGen.gui = new Vue({
 		/**
 		 * Enables or disables a map layer
 		 *
-		 * @param  {string}  name    The name of the map layer (key in the
-		 *                           `WurmMapGen.map.layers` object)
+		 * @param  {string}  name    The name of the map layer (key in the `WurmMapGen.map.layers` object)
 		 * @param  {boolean}  value  True to enable the layer
 		 *
 		 * @private
