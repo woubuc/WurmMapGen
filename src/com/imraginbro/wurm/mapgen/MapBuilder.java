@@ -12,10 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
-import com.imraginbro.wurm.mapgen.filegen.DBHandler;
-import com.imraginbro.wurm.mapgen.filegen.FileGeneration;
-import com.imraginbro.wurm.mapgen.filegen.FileManagement;
-import com.imraginbro.wurm.mapgen.filegen.PropertiesManager;
+import com.imraginbro.wurm.mapgen.filegen.FileGen;
 import com.wurmonline.mesh.MeshIO;
 import com.wurmonline.mesh.Tiles;
 import com.wurmonline.mesh.Tiles.Tile;
@@ -25,11 +22,13 @@ public class MapBuilder {
 	private final String separator = File.separator;
 	private int threadCounter = 0;
 	private int bridgeTileCount = 0;
-
-	public final static FileManagement fileManager = new FileManagement();
+	
 	public final static PropertiesManager propertiesManager = new PropertiesManager();
-	public final static FileGeneration fileGenerator = new FileGeneration();
+	public final static FileManager fileManager = new FileManager();
 	public final static DBHandler dbhandler = new DBHandler();
+	
+	private final static TemplateHandler templateHandler = new TemplateHandler();
+	private final static FileGen fileGenerator = new FileGen();
 
 	public static MeshIO map;
 
@@ -37,19 +36,29 @@ public class MapBuilder {
 		if (!propertiesManager.load()) {
 			return;
 		}
+		
 		fileManager.load();
 		fileManager.makeTempCopies();
 		fileManager.relocateFileVars();
+		
+		System.out.println("\nWurm MeshIO operations");
 		map = MeshIO.open(fileManager.map_topLayer.getAbsolutePath());
+		
 		dbhandler.load();
-		System.out.println("Starting map generation...");
+		
+		System.out.println("\nMap generation");
 		start();
-		fileManager.extractRescources("/resources/required.zip");
+		
+		templateHandler.copyAssets();
+		templateHandler.render();
+		
 		fileGenerator.generateFiles();
 		dbhandler.closeConnections();
+		
 		map.close();
-		System.out.println("Removing temporary files...");
+		System.out.println("\nRemove temp files");
 		fileManager.deleteDir(new File(propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp"));
+		System.out.println("   OK Temporary files removed");
 	}
 
 	private void start() {
@@ -67,16 +76,16 @@ public class MapBuilder {
 		Object obj = new Object();
 		while (!executor.isTerminated()) {
 			int percent = (int)((float)(totalProcesses - threadCounter) / (float)(totalProcesses) * 100.0f);
-			System.out.print("Completion percent: " + percent + "%\r");
+			System.out.print("      Completion percent: " + percent + "%\r");
 			try {
 				synchronized (obj) {
 					obj.wait(100);
 				}
 			} catch (InterruptedException ex) { }
 		}
-		System.out.println("Completion percent: 100%");
-		System.out.println("Map generation complete!");
-		System.out.println("Found " + bridgeTileCount + " bridge tiles to draw!");
+		System.out.println("      Completion percent: 100%");
+		if (propertiesManager.verbose) { System.out.println("      Found " + bridgeTileCount + " bridge tiles to draw"); }
+		System.out.println("   OK Map generation complete!");
 	}
 
 	private class MapTileThreader implements Runnable {
@@ -183,7 +192,7 @@ public class MapBuilder {
 				Color tileColor = thisTile.getColor();
 				imageTileGraphics.setColor(tileColor);
 				Statement statement = dbhandler.getZonesConnection().createStatement();
-				ResultSet resultSet = statement.executeQuery("SELECT TILEX, TILEY FROM BRIDGEPARTS WHERE TILEX >= "+minX+" AND TILEY >= "+minY+" AND TILEX < "+maxX+" AND TILEY < "+maxY+";"); 
+				ResultSet resultSet = statement.executeQuery("SELECT TILEX, TILEY FROM BRIDGEPARTS WHERE TILEX >= "+minX+" AND TILEY >= "+minY+" AND TILEX < "+maxX+" AND TILEY < "+maxY+";");
 				while (resultSet.next()) {
 					int tileX = resultSet.getInt("TILEX");
 					int tileY = resultSet.getInt("TILEY");

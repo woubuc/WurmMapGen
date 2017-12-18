@@ -1,19 +1,12 @@
-package com.imraginbro.wurm.mapgen.filegen;
+package com.imraginbro.wurm.mapgen;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -22,9 +15,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
 
-import com.imraginbro.wurm.mapgen.MapBuilder;
-
-public class FileManagement {
+public class FileManager {
 	
 	final static String separator = java.io.File.separator;
 	
@@ -64,60 +55,7 @@ public class FileManagement {
 		writer.write(null, new IIOImage( newImg, null, null ), param);
 	}
 	
-	public void copy(InputStream source , String destination) {
-        try {
-            Files.copy(source, Paths.get(destination), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ex) {
-        	ex.printStackTrace();
-        }
-    }
 	
-	public void extractRescources(String zipFileLocation) throws Exception {
-		System.out.println("Copying "+zipFileLocation+" file from jar...");
-		InputStream in = FileManagement.class.getResourceAsStream(zipFileLocation);
-		copy(in, MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + "required.zip");	
-		in.close();
-		System.out.println("Extracting resources from "+zipFileLocation+"...");
-		unzip(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + "required.zip", MapBuilder.propertiesManager.saveLocation.getAbsolutePath());
-	}
-	
-	public void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-		if (!MapBuilder.propertiesManager.replaceFiles && new File(filePath).exists()) {
-			return;
-		}
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
-        byte[] bytesIn = new byte[4096];
-        int read = 0;
-        while ((read = zipIn.read(bytesIn)) != -1) {
-            bos.write(bytesIn, 0, read);
-        }
-        bos.close();
-    }
-	
-	public void unzip(String zipFilePath, String destDirectory) throws IOException {
-        File destDir = new File(destDirectory);
-        if (!destDir.exists()) {
-            destDir.mkdir();
-        }
-        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
-        ZipEntry entry = zipIn.getNextEntry();
-        while (entry != null) {
-            String filePath = destDirectory + separator + entry.getName();
-            File checkDir = new File(destDirectory + separator + entry.getName()).getParentFile();
-            if (!checkDir.exists()) {
-            	checkDir.mkdir();
-            }
-            new File(destDirectory).mkdirs();
-            if (!entry.isDirectory()) {
-                extractFile(zipIn, filePath);
-            } else {
-                new File(filePath).mkdirs();
-            }
-            zipIn.closeEntry();
-            entry = zipIn.getNextEntry();
-        }
-        zipIn.close();
-    }
 	
 	@SuppressWarnings("resource")
 	public void copyFile(File sourceFile, File destFile) throws IOException {
@@ -142,13 +80,14 @@ public class FileManagement {
 	}
 	
 	public void makeTempCopies() {
+		System.out.println("\nCreate temp copies");
 		new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp").mkdirs();
 		for (int i = 0; i < fileBackupArray.length; i++) {
 			final File old = fileBackupArray[i];
 			if (!old.exists()) {
 				continue;
 			}
-			System.out.println("Creating a temp copy of "+old.getName()+"...");
+			System.out.println("      Creating a temp copy of "+old.getName()+"...");
 			try {
 				copyFile(old, new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + old.getName()));
 			} catch (IOException e) {
@@ -156,6 +95,7 @@ public class FileManagement {
 			}
 		}
 		relocateFileVars();
+		System.out.println("   OK Temp copies created");
 	}
 	
 	public void deleteDir(File file) {

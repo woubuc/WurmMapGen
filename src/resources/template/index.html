@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{serverName}} - WU MapGen</title>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700">
+	<link rel="stylesheet" href="dist/Leaflet.Coordinates-0.1.5.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-realtime="{{enableRealtimeMarkers}}">
+
+<!-- Interface elements -->
+<div id="gui" :class="{sidebar: sidebarVisible}">
+	<a id="sidebar-toggle" class="absolute transition z-gui" @click="sidebarVisible = !sidebarVisible">&#8801;</a>
+	<div id="sidebar" class="absolute transition z-gui" :class="{loaded: loaded}">
+		<div class="block padding">
+			<h1>{{serverName}}</h1>
+
+			{{#enableRealtimeMarkers}}
+			<div id="playercount" v-text="playerCountLabel"></div>
+			{{/enableRealtimeMarkers}}
+		</div>
+
+		{{#enableRealtimeMarkers}}
+			{{#showPlayers}}
+			<div class="block">
+				<label for="option-show-players" class="flex">
+					<input type="checkbox" class="transition" id="option-show-players" v-model="showPlayers">
+					<span>Show players</span>
+				</label>
+			</div>
+			{{/showPlayers}}
+		{{/enableRealtimeMarkers}}
+
+		{{#showDeeds}}
+		<div class="block">
+			<label for="option-show-villages" class="flex">
+				<input type="checkbox" class="transition" id="option-show-villages" v-model="showVillages">
+				<span>Show deeds</span>
+			</label>
+			<label for="option-show-village-borders" class="flex transition" :class="{inactive:!showVillages}">
+				<input type="checkbox" class="transition" id="option-show-village-borders" v-model="showVillageBorders">
+				<span>Show deed borders</span>
+			</label>
+		</div>
+		{{/showDeeds}}
+
+		{{#showGuardTowers}}
+		<div class="block">
+			<label for="option-show-towers" class="flex">
+				<input type="checkbox" class="transition" id="option-show-towers" v-model="showTowers"> Show guard towers
+			</label>
+			<label for="option-show-tower-borders" class="flex transition" :class="{inactive:!showTowers}">
+				<input type="checkbox" class="transition" id="option-show-tower-borders" v-model="showTowerBorders">
+				<span>Show guard tower borders</span>
+			</label>
+		</div>
+		{{/showGuardTowers}}
+
+		{{#showStructures}}
+		<div class="block">
+			<label for="option-show-structures" class="flex">
+				<input type="checkbox" class="transition" id="option-show-structures" v-model="showStructures"> Show structures
+			</label>
+		</div>
+		{{/showStructures}}
+
+	</div>
+
+	<div id="search" class="absolute transition z-gui" :class="{open: searchResultsOpen}">
+		<input v-model="searchQuery" placeholder="Search map for deeds, players, ..." autocomplete="off">
+		<div id="search-results" v-if="searchQuery !== ''">
+			<div v-for="result in searchResults" v-html="result.label" @click="focusMap(result.x, result.y); searchQuery = '';"></div>
+		</div>
+	</div>
+
+	<!-- Map container -->
+	<div id="map" class="absolute transition z-page"></div>
+</div>
+
+
+
+<!-- Load dependencies -->
+<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" defer integrity="sha384-ic4t376ZLdSPIUOxDpNXqU0UWe1c/2BkOXxiirQWAgKZzMJ6njfS1jdzbyMJbfil" crossorigin="anonymous"></script>
+<script src="dist/Leaflet.Coordinates-0.1.5.min.js" defer></script>
+
+<script src="https://unpkg.com/cookies-js@1.2.3/dist/cookies.min.js" integrity="sha384-Sz/TO/SdmTLSbgJdFXq+xsTAMk7YO3Ydk/LaJbERL9zgiFOpl39JoxkpLNBl0kFo" crossorigin="anonymous"></script>
+
+<script src="https://unpkg.com/whatwg-fetch@2.0.3/fetch.js" defer integrity="sha384-KaKx4aJnrltBb2dne61B/MRPA4uRfQvv6YW99RgjHax8TRjFxcC4BC19EEX0te/6" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/promise-polyfill@6.1.0/promise.min.js" defer integrity="sha384-LSmcy/rdMAgofokne7lmSBxJnXdRcj4SKZwPD+CE8At+QhWXRPvESLzhy/N2zHX+" crossorigin="anonymous"></script>
+
+<script src="https://unpkg.com/vue@2.5.9/dist/vue.min.js" defer integrity="sha384-zqrofuOynJ/XqmhOlwCW6O4dBXHCFqHlF9NP1NXopaE/7kBbN5QLwAvUiofvPrFi" crossorigin="anonymous"></script>
+
+<!-- Load app -->
+<script>window.WurmMapGen = {}; // Create a namespace for the app</script>
+<script type="text/javascript" defer src="app/util.js"></script>
+<script type="text/javascript" defer src="app/markers.js"></script>
+<script type="text/javascript" defer src="app/map.js"></script>
+<script type="text/javascript" defer src="app/gui.js"></script>
+<script type="text/javascript" defer src="app/main.js"></script>
+</body>
+</html>

@@ -1,10 +1,8 @@
-package com.imraginbro.wurm.mapgen.filegen;
+package com.imraginbro.wurm.mapgen;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import com.imraginbro.wurm.mapgen.MapBuilder;
 
 public class DBHandler {
 
