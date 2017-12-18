@@ -68,7 +68,7 @@ WurmMapGen.map = {
 			});
 
 			var marker = L.marker(xy(village.x, village.y),
-				{icon: WurmMapGen.markers[village.permanent ? 'main' : 'letter_' + village.name.charAt(0)]}
+				{icon: WurmMapGen.markers[village.permanent ? 'main' : 'letter_' + village.name.charAt(0).toLowerCase()]}
 			);
 
 			marker.bindPopup([
@@ -79,7 +79,7 @@ WurmMapGen.map = {
 				].join('<br>'));
 
 			// Open the marker popup when the border is clicked
-			border.on('click', function() { marker.openPopup(); });
+			border.on('click', WurmMapGen.map.openMarker.bind(null, marker));
 
 			villageBorders.addLayer(border);
 			villageMarkers.addLayer(marker);
@@ -113,7 +113,7 @@ WurmMapGen.map = {
 				].join('<br>'));
 
 			// Open the marker popup when the border is clicked
-			border.on('click', function() { marker.openPopup(); });
+			border.on('click', WurmMapGen.map.openMarker.bind(null, marker));
 
 			guardtowerBorders.addLayer(border);
 			guardtowerMarkers.addLayer(marker);
@@ -136,8 +136,8 @@ WurmMapGen.map = {
 			});
 
 			border.bindPopup([
-				'<div align="center"><b>' + escapeHtml(structure.getStructureName()) + '</b>',
-				'<i>Created by ' + escapeHtml(structure.getOwnerName()) + '</i></div>'
+				'<div align="center"><b>' + escapeHtml(structure.name) + '</b>',
+				'<i>Created by ' + escapeHtml(structure.creator) + '</i></div>'
 				].join('<br>'));
 
 			structureBorders.addLayer(border);
@@ -223,5 +223,13 @@ WurmMapGen.map = {
 			delete WurmMapGen.map.playerMarkers[playerId];
 			WurmMapGen.map.playerMarkerIds.splice(WurmMapGen.map.playerMarkerIds.indexOf[playerId], 1);
 		}
+	},
+
+	/**
+	 * Opens the popup for a map marker
+	 * @param  {L.marker}  marker  The marker
+	 */
+	openMarker: function(marker) {
+		marker.openPopup();
 	}
 };
