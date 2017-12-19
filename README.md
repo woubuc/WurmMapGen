@@ -3,6 +3,11 @@ Wurm Unlimited interactive tile map generator
 
 ![Screenshot](screenshot.png)
 
+## Features
+- Flexible instant search for any marker on the map
+- Realtime updated player location markers (optional)
+- Extensive configuration options
+
 ## Installation
 1. Download the latest release from the [releases page](https://github.com/woubuc/WurmMapGen/releases)
 2. Unpack the downloaded archive
