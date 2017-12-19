@@ -43,6 +43,20 @@ WurmMapGen.map = {
 			tms: false
 		}).addTo(map);
 
+		// Add coordinates display
+		L.control.coordinates({
+			position:"bottomleft",
+			labelFormatterLng : function(e){
+				if (e < 0) {
+					e = ((180 + e) + 180);
+				}
+				return Math.floor(e * config.xyMulitiplier) + ' x,';
+			},
+			labelFormatterLat : function(e){
+				return Math.floor((-e) * config.xyMulitiplier) + ' y';
+			}
+		}).addTo(map);
+
 		// Create layer groups
 		var villageBorders = WurmMapGen.map.layers.villageBorders = L.layerGroup();
 		var villageMarkers = WurmMapGen.map.layers.villageMarkers = L.layerGroup();
@@ -68,7 +82,7 @@ WurmMapGen.map = {
 			});
 
 			var marker = L.marker(xy(village.x, village.y),
-				{icon: WurmMapGen.markers[village.permanent ? 'main' : 'letter_' + village.name.charAt(0).toLowerCase()]}
+				{icon: WurmMapGen.markers.getMarker('village', village)}
 			);
 
 			marker.bindPopup([
@@ -77,6 +91,11 @@ WurmMapGen.map = {
 				'<b>Mayor:</b> ' + escapeHtml(village.mayor),
 				'<b>Citizens:</b> ' + escapeHtml(village.citizens)
 				].join('<br>'));
+
+			// Make sure text labels always show on top of other markers
+			if (WurmMapGen.config.markerType === 3) {
+				marker.setZIndexOffset(1000);
+			}
 
 			// Open the marker popup when the border is clicked
 			border.on('click', WurmMapGen.map.openMarker.bind(null, marker));
@@ -102,7 +121,7 @@ WurmMapGen.map = {
 			});
 
 			var marker = L.marker(xy(tower.x, tower.y),
-				{icon: WurmMapGen.markers.guardtower}
+				{icon: WurmMapGen.markers.getMarker('guardtower')}
 			);
 
 			marker.bindPopup([
@@ -153,20 +172,6 @@ WurmMapGen.map = {
 		guardtowerMarkers.addTo(map);
 		structureBorders.addTo(map);
 		playerMarkers.addTo(map);
-
-		// Add coordinates display
-		L.control.coordinates({
-			position:"bottomleft",
-			labelFormatterLng : function(e){
-				if (e < 0) {
-					e = ((180 + e) + 180);
-				}
-				return Math.floor(e * config.xyMulitiplier) + ' x,';
-			},
-			labelFormatterLat : function(e){
-				return Math.floor((-e) * config.xyMulitiplier) + ' y';
-			}
-		}).addTo(map);
 	},
 
 	/**
@@ -187,7 +192,7 @@ WurmMapGen.map = {
 				WurmMapGen.map.playerMarkers[player.id] = marker = {};
 
 				// Create new marker if one does not exist yet
-				marker.marker = L.marker(WurmMapGen.util.xy(player.x, player.y), {icon: WurmMapGen.markers.player});
+				marker.marker = L.marker(WurmMapGen.util.xy(player.x, player.y), {icon: WurmMapGen.markers.getMarker('player')});
 				marker.marker.bindPopup('<div align="center"><b>' + WurmMapGen.util.escapeHtml(player.name) + '</b></div>');
 
 				// Add player ID to marker IDs array for efficient iteration

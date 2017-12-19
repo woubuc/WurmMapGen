@@ -1,7 +1,6 @@
 package com.imraginbro.wurm.mapgen.filegen;
 
 import com.imraginbro.wurm.mapgen.MapBuilder;
-import com.imraginbro.wurm.mapgen.MapGen;
 import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
@@ -49,6 +48,8 @@ public class ConfigFileGen {
 		config.put("mapMaxZoom", maxZoom);
 		config.put("actualMapSize", mapSize);
 		config.put("maxMapSize", maxMapSize);
+		
+		config.put("markerType", MapBuilder.propertiesManager.markerType);
 		
 		config.put("showDeeds", MapBuilder.propertiesManager.showDeeds);
 		config.put("showGuardTowers", MapBuilder.propertiesManager.showGuardTowers);
