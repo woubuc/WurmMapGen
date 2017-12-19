@@ -37,7 +37,9 @@ WurmMapGen.map = {
 			minNativeZoom: config.nativeZoom,
 			minZoom: config.mapMinZoom,
 			maxZoom: config.mapMaxZoom,
-			bounds: mapBounds,
+			maxBounds: mapBounds,
+			maxBoundsViscosity: 1.0,
+			inertia: false,
 			attribution: 'Rendered with <a href="https://github.com/Garrett92/WurmMapGen">WurmMapGen</a>',
 			noWrap: true,
 			tms: false
