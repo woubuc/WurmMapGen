@@ -1,3 +1,9 @@
+WurmMapGen v2.1.0-rc2
+---------------------
+Added:   Search results now have icons to indicate the type of marker
+Fixed:   Map size bug when closing sidebar (#6)
+Fixed:   Unsupported syntax in IE11 (#7)
+
 WurmMapGen v2.1.0-rc1
 ---------------------
 Added:   Configurable marker types
