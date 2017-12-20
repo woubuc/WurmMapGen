@@ -1,0 +1,21 @@
+WurmMapGen v2.1.0-rc1
+---------------------
+Added:   Configurable marker types
+Changed: Instant search results now include structures and guard towers to instant search results
+
+WurmMapGen v2.0.0-rc3
+---------------------
+Fixed:   Several bugfixes in map rendering code
+
+WurmMapGen v2.0.0-rc2
+---------------------
+Changed: More verbose and consistent logging output
+
+WurmMapGen v2.0.0-rc1
+---------------------
+Added:   Map GUI built on Vue.js
+Added:   Search bar to quickly find deeds and players on the map
+Added:   Realtime updating player locations while the map is opened
+Added:   More values configurable through properties file
+Changed: Significant changes in file generation code
+Changed: Template generation using Mustache templates

@@ -64,7 +64,7 @@ public class MapBuilder {
 	private void start() {
 		final int tileCount = (getMapSize() / 256);
 		final int totalProcesses = (tileCount * tileCount);
-		ExecutorService executor = Executors.newFixedThreadPool(propertiesManager.threadLimit);
+		ExecutorService executor = Executors.newFixedThreadPool(propertiesManager.mapGeneratorThreads);
 		for (int x = 0; x < tileCount; x++) {
 			for (int y = 0; y < tileCount; y++) {
 				threadCounter++;
@@ -124,9 +124,9 @@ public class MapBuilder {
 				Color tileColor = thisTile.getColor();
 				imageTileGraphics.setColor(tileColor);
 				imageTileGraphics.fillRect(x, y, 1, 1);
-				if (propertiesManager.gen_map_shading) {
+				if (propertiesManager.mapGenerateShading) {
 					boolean checkPath = false;
-					if (!propertiesManager.gen_map_shade_paths) {
+					if (!propertiesManager.mapShadePaths) {
 						final int[] path_tile_types = {
 								Tiles.TILE_TYPE_COBBLESTONE, Tiles.TILE_TYPE_COBBLESTONE_ROUND,
 								Tiles.TILE_TYPE_MARBLE_BRICKS, Tiles.TILE_TYPE_MARBLE_SLABS,
@@ -159,7 +159,7 @@ public class MapBuilder {
 						}
 					}
 				}
-				if (propertiesManager.gen_map_water && tileHeight < 0) {
+				if (propertiesManager.mapGenerateWater && tileHeight < 0) {
 					imageTileGraphics.setColor(new Color(20,80,180,210));
 					imageTileGraphics.fillRect(x, y, 1, 1);
 				}
@@ -181,7 +181,7 @@ public class MapBuilder {
 	}
 
 	private void drawBridges(BufferedImage imageTile, int imageTileX, int imageTileY) throws SQLException {
-		if (propertiesManager.gen_map_bridges) {
+		if (propertiesManager.mapGenerateBridges) {
 			if (dbhandler.checkZonesConnection()) {
 				final int minX = (imageTileX * 256);
 				final int minY = (imageTileY * 256);

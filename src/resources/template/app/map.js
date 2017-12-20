@@ -37,10 +37,26 @@ WurmMapGen.map = {
 			minNativeZoom: config.nativeZoom,
 			minZoom: config.mapMinZoom,
 			maxZoom: config.mapMaxZoom,
-			bounds: mapBounds,
+			maxBounds: mapBounds,
+			maxBoundsViscosity: 1.0,
+			inertia: false,
 			attribution: 'Rendered with <a href="https://github.com/Garrett92/WurmMapGen">WurmMapGen</a>',
 			noWrap: true,
 			tms: false
+		}).addTo(map);
+
+		// Add coordinates display
+		L.control.coordinates({
+			position:"bottomleft",
+			labelFormatterLng : function(e){
+				if (e < 0) {
+					e = ((180 + e) + 180);
+				}
+				return Math.floor(e * config.xyMulitiplier) + ' x,';
+			},
+			labelFormatterLat : function(e){
+				return Math.floor((-e) * config.xyMulitiplier) + ' y';
+			}
 		}).addTo(map);
 
 		// Create layer groups
@@ -68,7 +84,7 @@ WurmMapGen.map = {
 			});
 
 			var marker = L.marker(xy(village.x, village.y),
-				{icon: WurmMapGen.markers[village.permanent ? 'main' : 'letter_' + village.name.charAt(0)]}
+				{icon: WurmMapGen.markers.getMarker('village', village)}
 			);
 
 			marker.bindPopup([
@@ -78,8 +94,13 @@ WurmMapGen.map = {
 				'<b>Citizens:</b> ' + escapeHtml(village.citizens)
 				].join('<br>'));
 
+			// Make sure text labels always show on top of other markers
+			if (WurmMapGen.config.markerType === 3) {
+				marker.setZIndexOffset(1000);
+			}
+
 			// Open the marker popup when the border is clicked
-			border.on('click', function() { marker.openPopup(); });
+			border.on('click', WurmMapGen.map.openMarker.bind(null, marker));
 
 			villageBorders.addLayer(border);
 			villageMarkers.addLayer(marker);
@@ -102,7 +123,7 @@ WurmMapGen.map = {
 			});
 
 			var marker = L.marker(xy(tower.x, tower.y),
-				{icon: WurmMapGen.markers.guardtower}
+				{icon: WurmMapGen.markers.getMarker('guardtower')}
 			);
 
 			marker.bindPopup([
@@ -113,7 +134,7 @@ WurmMapGen.map = {
 				].join('<br>'));
 
 			// Open the marker popup when the border is clicked
-			border.on('click', function() { marker.openPopup(); });
+			border.on('click', WurmMapGen.map.openMarker.bind(null, marker));
 
 			guardtowerBorders.addLayer(border);
 			guardtowerMarkers.addLayer(marker);
@@ -136,8 +157,8 @@ WurmMapGen.map = {
 			});
 
 			border.bindPopup([
-				'<div align="center"><b>' + escapeHtml(structure.getStructureName()) + '</b>',
-				'<i>Created by ' + escapeHtml(structure.getOwnerName()) + '</i></div>'
+				'<div align="center"><b>' + escapeHtml(structure.name) + '</b>',
+				'<i>Created by ' + escapeHtml(structure.creator) + '</i></div>'
 				].join('<br>'));
 
 			structureBorders.addLayer(border);
@@ -153,20 +174,6 @@ WurmMapGen.map = {
 		guardtowerMarkers.addTo(map);
 		structureBorders.addTo(map);
 		playerMarkers.addTo(map);
-
-		// Add coordinates display
-		L.control.coordinates({
-			position:"bottomleft",
-			labelFormatterLng : function(e){
-				if (e < 0) {
-					e = ((180 + e) + 180);
-				}
-				return Math.floor(e * config.xyMulitiplier) + ' x,';
-			},
-			labelFormatterLat : function(e){
-				return Math.floor((-e) * config.xyMulitiplier) + ' y';
-			}
-		}).addTo(map);
 	},
 
 	/**
@@ -187,7 +194,7 @@ WurmMapGen.map = {
 				WurmMapGen.map.playerMarkers[player.id] = marker = {};
 
 				// Create new marker if one does not exist yet
-				marker.marker = L.marker(WurmMapGen.util.xy(player.x, player.y), {icon: WurmMapGen.markers.player});
+				marker.marker = L.marker(WurmMapGen.util.xy(player.x, player.y), {icon: WurmMapGen.markers.getMarker('player')});
 				marker.marker.bindPopup('<div align="center"><b>' + WurmMapGen.util.escapeHtml(player.name) + '</b></div>');
 
 				// Add player ID to marker IDs array for efficient iteration
@@ -223,5 +230,13 @@ WurmMapGen.map = {
 			delete WurmMapGen.map.playerMarkers[playerId];
 			WurmMapGen.map.playerMarkerIds.splice(WurmMapGen.map.playerMarkerIds.indexOf[playerId], 1);
 		}
+	},
+
+	/**
+	 * Opens the popup for a map marker
+	 * @param  {L.marker}  marker  The marker
+	 */
+	openMarker: function(marker) {
+		marker.openPopup();
 	}
 };

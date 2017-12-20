@@ -45,12 +45,13 @@ WurmMapGen.gui = new Vue({
 			var i, index;
 
 			// Find online players who match the search query
-			if (WurmMapGen.players) {
+			if (WurmMapGen.players && this.showPlayers) {
 				for (i = 0; i < WurmMapGen.players.length; i++) {
 					var player = WurmMapGen.players[i];
 
 					var name = escapeHtml(player.name);
 
+					// Check if player name matches query
 					if ((index = name.toLowerCase().indexOf(query)) > -1) {
 						results.push({
 							type: 'player',
@@ -60,41 +61,92 @@ WurmMapGen.gui = new Vue({
 						});
 					}
 
-					if (results.length >= 8) {
-						break;
-					}
-				}
-
-				if (results.length >= 8) {
-					return results;
+					if (results.length >= 8) return results;
 				}
 			}
 
 			// Find villages that match the search query
-			for (i = 0; i < WurmMapGen.villages.length; i++) {
-				var village = WurmMapGen.villages[i];
+			if (this.showVillages) {
+				for (i = 0; i < WurmMapGen.villages.length; i++) {
+					var village = WurmMapGen.villages[i];
 
-				var name = escapeHtml(village.name);
-				var mayor = escapeHtml(village.mayor);
+					var name = escapeHtml(village.name);
+					var mayor = escapeHtml(village.mayor);
 
-				if ((index = name.toLowerCase().indexOf(query)) > -1) {
-					results.push({
-						type: 'village',
-						x: village.x,
-						y: village.y,
-						label: '<p>' + name.slice(0, index) + '<strong>' + name.slice(index, index + query.length) + '</strong>' + name.slice(index + query.length) + '</p><p class="small">Mayor: ' + mayor + '</p>'
-					});
-				} else if ((index = mayor.toLowerCase().indexOf(query)) > -1) {
-					results.push({
-						type: 'village',
-						x: village.x,
-						y: village.y,
-						label: '<p>' + name + '</p><p class="small">Mayor: ' + mayor.slice(0, index) + '<strong>' + mayor.slice(index, index + query.length) + '</strong>' + mayor.slice(index + query.length) + '</p>'
-					});
+					var label = '';
+
+					// Check if name matches query
+					if ((index = name.toLowerCase().indexOf(query)) > -1) {
+						label = '<p>' + name.slice(0, index) + '<strong>' + name.slice(index, index + query.length) + '</strong>' + name.slice(index + query.length) + '</p><p class="small">Mayor: ' + mayor + '</p>';
+
+					// Check if mayor name matches query
+					} else if ((index = mayor.toLowerCase().indexOf(query)) > -1) {
+						label = '<p>' + name + '</p><p class="small">Mayor: ' + mayor.slice(0, index) + '<strong>' + mayor.slice(index, index + query.length) + '</strong>' + mayor.slice(index + query.length) + '</p>';
+					}
+
+					if (label != '') {
+						results.push({
+							type: 'village',
+							x: village.x,
+							y: village.y,
+							label: label
+						});
+					}
+
+					if (results.length >= 8) return results;
 				}
+			}
 
-				if (results.length >= 8) {
-					break;
+			// Find structures that match the search query
+			if (this.showStructures) {
+				for (i = 0; i < WurmMapGen.structures.length; i++) {
+					var structure = WurmMapGen.structures[i];
+
+					var name = escapeHtml(structure.name);
+					var creator = escapeHtml(structure.creator);
+
+					var label = '';
+
+					// Check if structure name matches query
+					if ((index = name.toLowerCase().indexOf(query)) > -1) {
+						label = '<p>' + name.slice(0, index) + '<strong>' + name.slice(index, index + query.length) + '</strong>' + name.slice(index + query.length) + '</p><p class="small">Created by ' + creator + '</p>';
+
+					// Check if creator name matches query
+					} else if ((index = creator.toLowerCase().indexOf(query)) > -1) {
+						label = '<p>' + name + '</p><p class="small">Created by ' + creator.slice(0, index) + '<strong>' + creator.slice(index, index + query.length) + '</strong>' + creator.slice(index + query.length) + '</p>';
+					}
+
+					if (label != '') {
+						results.push({
+							type: 'structure',
+							x: (structure.borders[0] + structure.borders[2]) / 2,
+							y: (structure.borders[1] + structure.borders[3]) / 2,
+							label: label
+						});
+					}
+
+					if (results.length >= 8) return results;
+				}
+			}
+
+			// Find guard towers that match the search query
+			if (this.showTowers) {
+				for (i = 0; i < WurmMapGen.guardtowers.length; i++) {
+					var tower = WurmMapGen.guardtowers[i];
+
+					var creator = escapeHtml(tower.creator);
+
+					// Check if player name matches query
+					if ((index = creator.toLowerCase().indexOf(query)) > -1) {
+						results.push({
+							type: 'guardtower',
+							x: tower.x,
+							y: tower.y,
+							label: '<p>Guard tower</p><p class="small">Created by ' + creator.slice(0, index) + '<strong>' + creator.slice(index, index + query.length) + '</strong>' + creator.slice(index + query.length) + '</p>'
+						});
+					}
+
+					if (results.length >= 8) return results;
 				}
 			}
 
