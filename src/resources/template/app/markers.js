@@ -18,7 +18,8 @@ WurmMapGen.markers = {
 	 *
 	 * @returns  {L.Icon}  The marker icon
 	 */
-	getMarker: function(itemType, item = {}) {
+	getMarker: function(itemType, item) {
+		if (!item) { item = {}; }
 
 		// Classic style1 (letter-based) markers
 		if (WurmMapGen.config.markerType === 1) {
