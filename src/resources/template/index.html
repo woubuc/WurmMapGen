@@ -73,7 +73,7 @@
 	<div id="search" class="absolute transition z-gui" :class="{open: searchResultsOpen}">
 		<input v-model="searchQuery" placeholder="Search map for deeds, players, ..." autocomplete="off">
 		<div id="search-results" v-if="searchQuery !== ''">
-			<div v-for="result in searchResults" v-html="result.label" @click="focusMap(result.x, result.y); searchQuery = '';"></div>
+			<div v-for="result in searchResults" :class="result.type" v-html="result.label" @click="focusMap(result.x, result.y); searchQuery = '';"></div>
 		</div>
 	</div>
 
