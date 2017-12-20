@@ -7,6 +7,9 @@ WurmMapGen.gui = new Vue({
 
 	data: {
 		sidebarVisible: (window.innerWidth > 1200),
+		sidebarToggled: 0,
+		mapResizeInterval: null,
+
 		loaded: false,
 
 		searchQuery: '',
@@ -155,6 +158,17 @@ WurmMapGen.gui = new Vue({
 	},
 
 	watch: {
+		// When the sidebar is toggled, update the map
+		sidebarVisible: function() {
+			this.sidebarToggled = Date.now();
+			this.mapResizeInterval = window.setInterval(function() {
+				WurmMapGen.map.map.invalidateSize({debounceMoveend: true});
+				if (WurmMapGen.gui.sidebarToggled < Date.now() - 150) {
+					clearInterval(WurmMapGen.gui.mapResizeInterval);
+				}
+			}, 10);
+		},
+
 		showStructures: function(value) {
         	this._setMapLayer('structureBorders', value);
         },
