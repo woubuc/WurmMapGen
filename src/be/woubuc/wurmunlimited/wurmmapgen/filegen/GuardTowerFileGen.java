@@ -1,6 +1,6 @@
 package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
-import be.woubuc.wurmunlimited.wurmmapgen.MapBuilder;
+import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -23,14 +23,8 @@ public class GuardTowerFileGen {
 		System.out.println();
 		System.out.println("Guard tower data");
 		
-		// Check if we're connected to the necessary databases
-		if (!MapBuilder.dbhandler.checkItemsConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
-			System.err.println(" WARN could not connect to one or more databases");
-			return;
-		}
-		
-		if (MapBuilder.propertiesManager.verbose) System.out.println("      loading guard towers from wurmitems.db");
-		Statement statement = MapBuilder.dbhandler.getItemsConnection().createStatement();
+		if (WurmMapGen.properties.verbose) System.out.println("      loading guard towers from wurmitems.db");
+		Statement statement = WurmMapGen.db.getItems().getConnection().createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT * FROM ITEMS WHERE (TEMPLATEID='384' OR TEMPLATEID='430' OR TEMPLATEID='528' OR TEMPLATEID='638' OR TEMPLATEID='996') AND CREATIONSTATE='0';");
 		
 		ArrayList<GuardTower> guardTowers = new ArrayList<>();
@@ -82,7 +76,7 @@ public class GuardTowerFileGen {
 		dataObject.put("guardtowers", data);
 		
 		// Write JSON data to file
-		if (MapBuilder.propertiesManager.verbose) System.out.println("      creating data/guardtowers.json");
+		if (WurmMapGen.properties.verbose) System.out.println("      creating data/guardtowers.json");
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();
@@ -91,7 +85,7 @@ public class GuardTowerFileGen {
 	}
 	
 	/**
-	 * Describes a guard tower in the database
+	 * Describes a guard tower in the db
 	 */
 	private class GuardTower {
 		
@@ -150,10 +144,10 @@ public class GuardTowerFileGen {
 		float getDmg() { return this.dmg; }
 		
 		/**
-		 * Loads the name of the tower's owner from the database
+		 * Loads the name of the tower's owner from the db
 		 */
 		private void populateOwnerName() {
-			try (Statement statement = MapBuilder.dbhandler.getPlayersConnection().createStatement();
+			try (Statement statement = WurmMapGen.db.getPlayers().getConnection().createStatement();
 				 ResultSet result = statement.executeQuery("SELECT NAME FROM PLAYERS WHERE WURMID='"+this.ownerID+"';")) {
 				
 				if (result.next()) {

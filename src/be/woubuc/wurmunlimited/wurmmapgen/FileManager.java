@@ -1,11 +1,13 @@
 package be.woubuc.wurmunlimited.wurmmapgen;
 
+import org.apache.commons.io.FileUtils;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 
 import javax.imageio.IIOImage;
@@ -19,26 +21,54 @@ public class FileManager {
 	
 	final static String separator = java.io.File.separator;
 	
-	public File map_topLayer = null;
-	public File db_wurmZones = null;
-	public File db_wurmItems = null;
-	public File db_wurmPlayers = null;
+	public WurmFile map_topLayer;
+	public DatabaseFile db_wurmZones;
+	public DatabaseFile db_wurmItems;
+	public DatabaseFile db_wurmPlayers;
 	
-	File[] fileBackupArray = null;
+	private Path tempDir;
 	
-	public void load() {
-		map_topLayer = new File(MapBuilder.propertiesManager.wurmMapLocation.getAbsolutePath() + separator + "top_layer.map");
-		db_wurmZones = new File(MapBuilder.propertiesManager.wurmMapLocation.getAbsolutePath() + separator + "sqlite" + separator + "wurmzones.db");
-		db_wurmItems = new File(MapBuilder.propertiesManager.wurmMapLocation.getAbsolutePath() + separator + "sqlite" + separator + "wurmitems.db");
-		db_wurmPlayers = new File(MapBuilder.propertiesManager.wurmMapLocation.getAbsolutePath() + separator + "sqlite" + separator + "wurmplayers.db");
-		fileBackupArray = new File[]{map_topLayer, db_wurmZones, db_wurmItems, db_wurmPlayers};
+	/**
+	 * Initialises a new FileManager instance
+	 */
+	FileManager() {
+		// Get temp directory path
+		tempDir = Paths.get(System.getProperty("java.io.tmpdir"),"WurmMapGen", Long.toString(System.currentTimeMillis())).toAbsolutePath().normalize();
 	}
 	
-	public void relocateFileVars() {
-		map_topLayer = new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + map_topLayer.getName());
-		db_wurmZones = new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + db_wurmZones.getName());
-		db_wurmItems = new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + db_wurmItems.getName());
-		db_wurmPlayers = new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + db_wurmPlayers.getName());
+	/**
+	 * Loads all required files and makes copies in a temp directory
+	 */
+	public void load() throws IOException {
+		System.out.println("\nCreate temp file copies");
+		final long startTime = System.currentTimeMillis();
+		
+		Files.createDirectories(tempDir);
+		if (WurmMapGen.properties.verbose) { System.out.println("      Created directory " + tempDir.toString()); }
+		
+		if (WurmMapGen.properties.verbose) { System.out.println("      Loading required files"); }
+		map_topLayer = new WurmFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "top_layer.map"));
+		db_wurmZones = new DatabaseFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "sqlite", "wurmzones.db"));
+		db_wurmItems = new DatabaseFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "sqlite", "wurmitems.db"));
+		db_wurmPlayers = new DatabaseFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "sqlite", "wurmplayers.db"));
+		
+		if (WurmMapGen.properties.verbose) { System.out.println("      Copying files to temp directory"); }
+		map_topLayer = map_topLayer.copyToDirectory(tempDir);
+		db_wurmZones = db_wurmZones.copyToDirectory(tempDir);
+		db_wurmItems = db_wurmItems.copyToDirectory(tempDir);
+		db_wurmPlayers = db_wurmPlayers.copyToDirectory(tempDir);
+		
+		System.out.println("   OK Temp files copied in " + (System.currentTimeMillis() - startTime) + "ms");
+	}
+	
+	/**
+	 * Unloads the files and deletes the previously created temporary files
+	 */
+	public void unload() throws IOException {
+		System.out.println("\nRemove temp file copies");
+		
+		FileUtils.deleteDirectory(tempDir.toFile());
+		System.out.println("   OK Directory deleted");
 	}
 	
 	public void saveToFile(BufferedImage newImg, File file) throws IOException {
@@ -55,57 +85,69 @@ public class FileManager {
 		writer.write(null, new IIOImage( newImg, null, null ), param);
 	}
 	
-	
-	
-	@SuppressWarnings("resource")
-	public void copyFile(File sourceFile, File destFile) throws IOException {
-	    if(!destFile.exists()) {
-	        destFile.createNewFile();
-	    }
-	    FileChannel source = null;
-	    FileChannel destination = null;
-	    try {
-	        source = new FileInputStream(sourceFile).getChannel();
-	        destination = new FileOutputStream(destFile).getChannel();
-	        destination.transferFrom(source, 0, source.size());
-	    }
-	    finally {
-	        if(source != null) {
-	            source.close();
-	        }
-	        if(destination != null) {
-	            destination.close();
-	        }
-	    }
-	}
-	
-	public void makeTempCopies() {
-		System.out.println("\nCreate temp copies");
-		new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp").mkdirs();
-		for (int i = 0; i < fileBackupArray.length; i++) {
-			final File old = fileBackupArray[i];
-			if (!old.exists()) {
-				continue;
-			}
-			System.out.println("      Creating a temp copy of "+old.getName()+"...");
-			try {
-				copyFile(old, new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp" + separator + old.getName()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	/**
+	 * Describes a Wurm Unlimited SQLite db file
+	 */
+	class DatabaseFile extends File {
+		
+		/**
+		 * Initialises the file
+		 * @param  filePath  Path to the file
+		 */
+		DatabaseFile(Path filePath) {
+			super(filePath.toAbsolutePath().normalize().toString());
 		}
-		relocateFileVars();
-		System.out.println("   OK Temp copies created");
+		
+		/**
+		 * Copies the db file and all associated files to the given directory
+		 * @param  destination  The destination directory
+		 */
+		DatabaseFile copyToDirectory(Path destination) throws IOException {
+			if (WurmMapGen.properties.verbose) { System.out.println("      -> " + this.getName()); }
+			
+			DatabaseFile dest = new DatabaseFile(Paths.get(destination.toString(), this.getName()));
+			FileUtils.copyFile((File) this, dest);
+			
+			File wal = new File(this.getAbsolutePath() + "-wal");
+			if (wal.exists()) {
+				if (WurmMapGen.properties.verbose) { System.out.println("      -> " + wal.getName()); }
+				FileUtils.copyFileToDirectory(wal, destination.toFile());
+			}
+			
+			File shm = new File(this.getAbsolutePath() + "-shm");
+			if (shm.exists()) {
+				if (WurmMapGen.properties.verbose) { System.out.println("      -> " + shm.getName()); }
+				FileUtils.copyFileToDirectory(shm, destination.toFile());
+			}
+			
+			return dest;
+		}
 	}
 	
-	public void deleteDir(File file) {
-	    File[] contents = file.listFiles();
-	    if (contents != null) {
-	        for (File f : contents) {
-	            deleteDir(f);
-	        }
-	    }
-	    file.delete();
+	/**
+	 * Describes a Wurm Unlimited file
+	 */
+	class WurmFile extends File {
+		
+		/**
+		 * Initialises the file
+		 * @param  filePath  Path to the file
+		 */
+		WurmFile(Path filePath) {
+			super(filePath.toAbsolutePath().normalize().toString());
+		}
+		
+		/**
+		 * Copies the map file to the given directory
+		 * @param  destination  The destination directory
+		 */
+		WurmFile copyToDirectory(Path destination) throws IOException {
+			if (WurmMapGen.properties.verbose) { System.out.println("      -> " + this.getName()); }
+			
+			WurmFile dest = new WurmFile(Paths.get(destination.toString(), this.getName()));
+			FileUtils.copyFile((File) this, dest);
+			
+			return dest;
+		}
 	}
-	
 }

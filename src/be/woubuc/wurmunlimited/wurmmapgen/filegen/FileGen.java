@@ -1,10 +1,10 @@
 package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
+import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-
-import be.woubuc.wurmunlimited.wurmmapgen.MapBuilder;
 
 public class FileGen {
 	
@@ -15,20 +15,20 @@ public class FileGen {
 	/**
 	 * Generates the required datafiles for the map
 	 */
-	public void generateFiles() throws IOException, SQLException {
+	public void generateDataFiles() throws IOException, SQLException {
 		ConfigFileGen.generateConfigFile();
 		ConfigFileGen.generatePhpConfigFile();
 		
-		if (MapBuilder.propertiesManager.showDeeds) {
+		if (WurmMapGen.properties.showDeeds) {
 			villageFileGen.generateVillageFile();
 		}
 		
-		if (MapBuilder.propertiesManager.showStructures) {
-			structureFileGen.generateStructureFile(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "structures.json").toString());
+		if (WurmMapGen.properties.showStructures) {
+			structureFileGen.generateStructureFile(Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "structures.json").toString());
 		}
 		
-		if (MapBuilder.propertiesManager.showGuardTowers) {
-			guardTowerFileGen.generateGuardTowerFile(Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "guardtowers.json").toString());
+		if (WurmMapGen.properties.showGuardTowers) {
+			guardTowerFileGen.generateGuardTowerFile(Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "guardtowers.json").toString());
 		}
 	}
 }

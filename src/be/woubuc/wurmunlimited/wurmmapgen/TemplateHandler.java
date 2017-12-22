@@ -18,21 +18,21 @@ public class TemplateHandler {
 		System.out.println("\nTemplate");
 		
 		try {
-			if (MapBuilder.propertiesManager.verbose) System.out.println("      assembling template data");
+			if (WurmMapGen.properties.verbose) System.out.println("      assembling template data");
 			
 			Map<String, Object> data = new HashMap<>();
-			data.put("serverName", MapBuilder.propertiesManager.serverName);
-			data.put("enableRealtimeMarkers", MapBuilder.propertiesManager.enableRealtimeMarkers);
+			data.put("serverName", WurmMapGen.properties.serverName);
+			data.put("enableRealtimeMarkers", WurmMapGen.properties.enableRealtimeMarkers);
 			
-			data.put("showPlayers", MapBuilder.propertiesManager.showPlayers);
-			data.put("showDeeds", MapBuilder.propertiesManager.showDeeds);
-			data.put("showGuardTowers", MapBuilder.propertiesManager.showGuardTowers);
-			data.put("showStructures", MapBuilder.propertiesManager.showStructures);
+			data.put("showPlayers", WurmMapGen.properties.showPlayers);
+			data.put("showDeeds", WurmMapGen.properties.showDeeds);
+			data.put("showGuardTowers", WurmMapGen.properties.showGuardTowers);
+			data.put("showStructures", WurmMapGen.properties.showStructures);
 			
-			if (MapBuilder.propertiesManager.verbose) System.out.println("      compiling index.html");
+			if (WurmMapGen.properties.verbose) System.out.println("      compiling index.html");
 			
 			FileReader template = new FileReader(templateDirectory + File.separator + "index.html");
-			FileWriter output = new FileWriter(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + File.separator + "index.html", false);
+			FileWriter output = new FileWriter(WurmMapGen.properties.saveLocation.getAbsolutePath() + File.separator + "index.html", false);
 			
 			Mustache.compiler().compile(template).execute(data, output);
 			
@@ -68,11 +68,11 @@ public class TemplateHandler {
 	 * @param directory the directory within ./template to copy
 	 */
 	private void copyAssetsDirectory(String directory) throws IOException {
-		if (MapBuilder.propertiesManager.verbose) System.out.println("      copying directory " + directory);
+		if (WurmMapGen.properties.verbose) System.out.println("      copying directory " + directory);
 		
 		FileUtils.copyDirectory(
 				new File(templateDirectory + File.separator + directory),
-				new File(MapBuilder.propertiesManager.saveLocation.getAbsolutePath() + File.separator + directory)
+				new File(WurmMapGen.properties.saveLocation.getAbsolutePath() + File.separator + directory)
 		);
 	}
 

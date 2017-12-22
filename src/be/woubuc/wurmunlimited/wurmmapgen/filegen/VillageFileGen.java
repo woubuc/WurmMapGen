@@ -1,7 +1,6 @@
 package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
-import be.woubuc.wurmunlimited.wurmmapgen.MapBuilder;
-
+import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -23,15 +22,9 @@ public class VillageFileGen {
 		System.out.println();
 		System.out.println("Deeds data");
 		
-		// Check if we're connected to the necessary databases
-		if (!MapBuilder.dbhandler.checkZonesConnection() || !MapBuilder.dbhandler.checkItemsConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
-			System.err.println(" WARN could not connect to one or more databases");
-			return;
-		}
-		
 		// Load list of villages
-		if (MapBuilder.propertiesManager.verbose) System.out.println("      loading villages from wurmzones.db");
-		Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
+		if (WurmMapGen.properties.verbose) System.out.println("      Loading villages from wurmzones.db");
+		Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT ID FROM VILLAGES WHERE DISBANDED=0;");
 		
 		ArrayList<Village> villages = new ArrayList<>();
@@ -82,8 +75,8 @@ public class VillageFileGen {
 		dataObject.put("villages", data);
 		
 		// Write JSON data to file
-		if (MapBuilder.propertiesManager.verbose) System.out.println("      creating data/villages.json");
-		String filePath = Paths.get(MapBuilder.propertiesManager.saveLocation.getAbsolutePath(), "data", "villages.json").toString();
+		if (WurmMapGen.properties.verbose) System.out.println("      creating data/villages.json");
+		String filePath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "villages.json").toString();
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();
@@ -92,7 +85,7 @@ public class VillageFileGen {
 	}
 	
 	/**
-	 * Describes a single village entry in the database
+	 * Describes a single village entry in the db
 	 */
 	private class Village {
 		
@@ -117,7 +110,7 @@ public class VillageFileGen {
 		
 		/**
 		 * Initialises a Village
-		 * @param villageID The database ID of the village
+		 * @param villageID The db ID of the village
 		 */
 		Village(int villageID) {
 			this.villageID = villageID;
@@ -143,10 +136,10 @@ public class VillageFileGen {
 		int getTokenY() { return tokenY; }
 		
 		/**
-		 * Loads the village data from the database
+		 * Loads the village data from the db
 		 */
 		private void populateVillage() {
-			try (Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
+			try (Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 				 ResultSet result = statement.executeQuery("SELECT * FROM VILLAGES WHERE ID='" + villageID + "';")) {
 				
 				if (result.next()) {
@@ -170,10 +163,10 @@ public class VillageFileGen {
 		}
 		
 		/**
-		 * Loads the location of the village token from the database
+		 * Loads the location of the village token from the db
 		 */
 		private void populateTokenLocation() {
-			try (Statement statement = MapBuilder.dbhandler.getItemsConnection().createStatement();
+			try (Statement statement = WurmMapGen.db.getItems().getConnection().createStatement();
 				 ResultSet result = statement.executeQuery("SELECT POSX, POSY FROM ITEMS WHERE WURMID='" + tokenID + "';")) {
 				
 				if (result.next()) {
@@ -193,16 +186,16 @@ public class VillageFileGen {
 		}
 		
 		/**
-		 * Loads the number of citizens from the database
+		 * Loads the number of citizens from the db
 		 */
 		private void populateCitizenCount() {
-			try (Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
-				ResultSet result = statement.executeQuery("SELECT WURMID FROM CITIZENS WHERE VILLAGEID='" + villageID + "';")) {
+			try (Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
+				 ResultSet result = statement.executeQuery("SELECT WURMID FROM CITIZENS WHERE VILLAGEID='" + villageID + "';")) {
 				
 				while (result.next()) {
 					long tempID = result.getLong("WURMID");
 					
-					try (Statement statementPlayers = MapBuilder.dbhandler.getPlayersConnection().createStatement();
+					try (Statement statementPlayers = WurmMapGen.db.getPlayers().getConnection().createStatement();
 						 ResultSet resultPlayers = statementPlayers.executeQuery("Select WURMID FROM PLAYERS WHERE WURMID='" + tempID + "';")) {
 						
 						if (resultPlayers.next()) {

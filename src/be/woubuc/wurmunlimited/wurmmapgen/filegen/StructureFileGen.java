@@ -1,6 +1,6 @@
 package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
-import be.woubuc.wurmunlimited.wurmmapgen.MapBuilder;
+import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -21,18 +21,12 @@ public class StructureFileGen {
 		System.out.println();
 		System.out.println("Structure data");
 		
-		// Check if we're connected to the necessary databases
-		if (!MapBuilder.dbhandler.checkZonesConnection() || !MapBuilder.dbhandler.checkPlayersConnection()) {
-			System.err.println(" WARN could not connect to one or more databases");
-			return;
-		}
-		
 		// Prepare JSON container object
 		JSONObject dataObject = new JSONObject();
 		JSONArray data = new JSONArray();
 		
-		if (MapBuilder.propertiesManager.verbose) System.out.println("      loading structures from wurmzones.db");
-		Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
+		if (WurmMapGen.properties.verbose) System.out.println("      loading structures from wurmzones.db");
+		Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT WURMID FROM STRUCTURES WHERE FINISHED='1';");
 		
 		// Keep track of the number of structures loaded
@@ -76,7 +70,7 @@ public class StructureFileGen {
 		dataObject.put("structures", data);
 		
 		// Write JSON data to file
-		if (MapBuilder.propertiesManager.verbose) System.out.println("      writing data/structures.json");
+		if (WurmMapGen.properties.verbose) System.out.println("      writing data/structures.json");
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();
@@ -85,7 +79,7 @@ public class StructureFileGen {
 	}
 	
 	/**
-	 * Describes a single structure entry in the database
+	 * Describes a single structure entry in the db
 	 */
 	private class Structure {
 		
@@ -102,7 +96,7 @@ public class StructureFileGen {
 		
 		/**
 		 * Initialises a structure
-		 * @param structureID the database ID of the structure
+		 * @param structureID the db ID of the structure
 		 */
 		Structure(Long structureID) {
 			this.structureID = structureID;
@@ -121,10 +115,10 @@ public class StructureFileGen {
 		int getMaxY() { return this.maxY; }
 		
 		/**
-		 * Populates the structure instance with data from the database
+		 * Populates the structure instance with data from the db
 		 */
 		private void populateStructure() {
-			try (Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
+			try (Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 				 ResultSet result = statement.executeQuery("SELECT * FROM STRUCTURES WHERE WURMID='"+this.structureID+"';")) {
 				
 				if (result.next()) {
@@ -139,10 +133,10 @@ public class StructureFileGen {
 		}
 		
 		/**
-		 * Gets the name of the structure's owner from the database
+		 * Gets the name of the structure's owner from the db
 		 */
 		private void populateOwnerName() {
-			try (Statement statement = MapBuilder.dbhandler.getPlayersConnection().createStatement();
+			try (Statement statement = WurmMapGen.db.getPlayers().getConnection().createStatement();
 				 ResultSet resultSet = statement.executeQuery("SELECT NAME FROM PLAYERS WHERE WURMID='"+this.ownerID+"';")) {
 				
 				if (resultSet.next()) {
@@ -158,7 +152,7 @@ public class StructureFileGen {
 		 * Calculates the minimum and maximum coordinates for the structure based on the coordinates of its tiles
 		 */
 		private void generateMinMax() {
-			try (Statement statement = MapBuilder.dbhandler.getZonesConnection().createStatement();
+			try (Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 				 ResultSet result = statement.executeQuery("SELECT TILEX, TILEY FROM BUILDTILES WHERE STRUCTUREID='" + this.structureID + "';")) {
 				
 				if (result.next()) {

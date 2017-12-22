@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,68 +12,49 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
-import be.woubuc.wurmunlimited.wurmmapgen.filegen.FileGen;
 import com.wurmonline.mesh.MeshIO;
 import com.wurmonline.mesh.Tiles;
 import com.wurmonline.mesh.Tiles.Tile;
 
-public class MapBuilder {
+import static be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen.properties;
+
+public class TileMapGenerator {
 
 	private final String separator = File.separator;
 	private int threadCounter = 0;
-	private int bridgeTileCount = 0;
 	
-	public final static PropertiesManager propertiesManager = new PropertiesManager();
-	public final static FileManager fileManager = new FileManager();
-	public final static DBHandler dbhandler = new DBHandler();
+	private final int tileSize = 256;
 	
-	private final static TemplateHandler templateHandler = new TemplateHandler();
-	private final static FileGen fileGenerator = new FileGen();
-
-	public static MeshIO map;
+	public MeshIO map;
 	
 	/**
-	 * Initialises the map builder
-	 * @param  propertiesFilePath  Path to the properties file that should be used
+	 * Opens the MeshIO connection required for the map builder
 	 */
-	public MapBuilder(Path propertiesFilePath) throws Exception {
-		if (!propertiesManager.load(propertiesFilePath)) {
-			throw new Exception("Could not load properties");
-		}
+	public void openMap() throws IOException {
+		System.out.println("\nOpening Wurm MeshIO connection");
+		map = MeshIO.open(WurmMapGen.fileManager.map_topLayer.getAbsolutePath());
+		if (WurmMapGen.properties.verbose) System.out.println("   OK Connection opened");
 	}
 	
 	/**
-	 * Builds the map
+	 * Closes the MeshIO connection
 	 */
-	public void buildMap() throws Exception {
-		fileManager.load();
-		fileManager.makeTempCopies();
-		fileManager.relocateFileVars();
-		
-		System.out.println("\nWurm MeshIO operations");
-		map = MeshIO.open(fileManager.map_topLayer.getAbsolutePath());
-		
-		dbhandler.load();
-		
-		System.out.println("\nMap generation");
-		start();
-		
-		templateHandler.copyAssets();
-		templateHandler.render();
-		
-		fileGenerator.generateFiles();
-		dbhandler.closeConnections();
-		
+	public void closeMap() throws IOException {
+		if (WurmMapGen.properties.verbose) System.out.println("\nClose Wurm MeshIO connection");
 		map.close();
-		System.out.println("\nRemove temp files");
-		fileManager.deleteDir(new File(propertiesManager.saveLocation.getAbsolutePath() + separator + "tmp"));
-		System.out.println("   OK Temporary files removed");
+		if (WurmMapGen.properties.verbose) System.out.println("   OK Connection closed");
 	}
-
-	private void start() {
-		final int tileCount = (getMapSize() / 256);
+	
+	/**
+	 * Generates the map tile images
+	 */
+	public void generateMapTiles() {
+		System.out.println("\nMap generation");
+		final long startTime = System.currentTimeMillis();
+		
+		final int tileCount = (getMapSize() / tileSize);
 		final int totalProcesses = (tileCount * tileCount);
-		ExecutorService executor = Executors.newFixedThreadPool(propertiesManager.mapGeneratorThreads);
+		ExecutorService executor = Executors.newFixedThreadPool(properties.mapGeneratorThreads);
 		for (int x = 0; x < tileCount; x++) {
 			for (int y = 0; y < tileCount; y++) {
 				threadCounter++;
@@ -86,16 +66,15 @@ public class MapBuilder {
 		Object obj = new Object();
 		while (!executor.isTerminated()) {
 			int percent = (int)((float)(totalProcesses - threadCounter) / (float)(totalProcesses) * 100.0f);
-			System.out.print("      Completion percent: " + percent + "%\r");
+			System.out.print("      Generating map tiles " + percent + "%\r");
 			try {
 				synchronized (obj) {
 					obj.wait(100);
 				}
 			} catch (InterruptedException ex) { }
 		}
-		System.out.println("      Completion percent: 100%");
-		if (propertiesManager.verbose) { System.out.println("      Found " + bridgeTileCount + " bridge tiles to draw"); }
-		System.out.println("   OK Map generation complete!");
+		
+		System.out.println("   OK Map tiles generated in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 
 	private class MapTileThreader implements Runnable {
@@ -121,12 +100,12 @@ public class MapBuilder {
 	}
 
 	private void generateImageTile(final int imageTileX, final int imageTileY) {
-		final BufferedImage imageTile = new BufferedImage(256, 256, BufferedImage.TYPE_INT_ARGB);
+		final BufferedImage imageTile = new BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D imageTileGraphics = imageTile.createGraphics();
-		for (int x = 0; x < 256; x++) {
-			for (int y = 0; y < 256; y++) {
-				final int tileX = (imageTileX * 256) + x;
-				final int tileY = (imageTileY * 256) + y;
+		for (int x = 0; x < tileSize; x++) {
+			for (int y = 0; y < tileSize; y++) {
+				final int tileX = (imageTileX * tileSize) + x;
+				final int tileY = (imageTileY * tileSize) + y;
 				int tileEncoded = map.getTile(tileX, tileY);
 				byte tileType = Tiles.decodeType(tileEncoded);
 				short tileHeight = Tiles.decodeHeight(tileEncoded);
@@ -134,9 +113,9 @@ public class MapBuilder {
 				Color tileColor = thisTile.getColor();
 				imageTileGraphics.setColor(tileColor);
 				imageTileGraphics.fillRect(x, y, 1, 1);
-				if (propertiesManager.mapGenerateShading) {
+				if (properties.mapGenerateShading) {
 					boolean checkPath = false;
-					if (!propertiesManager.mapShadePaths) {
+					if (!properties.mapShadePaths) {
 						final int[] path_tile_types = {
 								Tiles.TILE_TYPE_COBBLESTONE, Tiles.TILE_TYPE_COBBLESTONE_ROUND,
 								Tiles.TILE_TYPE_MARBLE_BRICKS, Tiles.TILE_TYPE_MARBLE_SLABS,
@@ -169,7 +148,7 @@ public class MapBuilder {
 						}
 					}
 				}
-				if (propertiesManager.mapGenerateWater && tileHeight < 0) {
+				if (properties.mapGenerateWater && tileHeight < 0) {
 					imageTileGraphics.setColor(new Color(20,80,180,210));
 					imageTileGraphics.fillRect(x, y, 1, 1);
 				}
@@ -180,9 +159,9 @@ public class MapBuilder {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		new File(propertiesManager.saveLocation.getAbsolutePath() + separator + "images").mkdirs();
+		new File(properties.saveLocation.getAbsolutePath() + separator + "images").mkdirs();
 		try {
-			fileManager.saveToFile(imageTile, new File(propertiesManager.saveLocation.getAbsolutePath() + separator + "images" + separator + imageTileX + "-" + imageTileY + ".png"));
+			WurmMapGen.fileManager.saveToFile(imageTile, new File(properties.saveLocation.getAbsolutePath() + separator + "images" + separator + imageTileX + "-" + imageTileY + ".png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -191,23 +170,22 @@ public class MapBuilder {
 	}
 
 	private void drawBridges(BufferedImage imageTile, int imageTileX, int imageTileY) throws SQLException {
-		if (propertiesManager.mapGenerateBridges) {
-			if (dbhandler.checkZonesConnection()) {
-				final int minX = (imageTileX * 256);
-				final int minY = (imageTileY * 256);
-				final int maxX = minX + 256;
-				final int maxY = minY + 256;
+		if (properties.mapGenerateBridges) {
+			if (WurmMapGen.db.getZones().isConnected()) {
+				final int minX = (imageTileX * tileSize);
+				final int minY = (imageTileY * tileSize);
+				final int maxX = minX + tileSize;
+				final int maxY = minY + tileSize;
 				Graphics2D imageTileGraphics = imageTile.createGraphics();
 				Tile thisTile = Tiles.getTile(9);
 				Color tileColor = thisTile.getColor();
 				imageTileGraphics.setColor(tileColor);
-				Statement statement = dbhandler.getZonesConnection().createStatement();
+				Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 				ResultSet resultSet = statement.executeQuery("SELECT TILEX, TILEY FROM BRIDGEPARTS WHERE TILEX >= "+minX+" AND TILEY >= "+minY+" AND TILEX < "+maxX+" AND TILEY < "+maxY+";");
 				while (resultSet.next()) {
 					int tileX = resultSet.getInt("TILEX");
 					int tileY = resultSet.getInt("TILEY");
 					imageTileGraphics.fillRect((tileX - minX), (tileY - minY), 1, 1);
-					bridgeTileCount++;
 				}
 				resultSet.close();
 				statement.close();

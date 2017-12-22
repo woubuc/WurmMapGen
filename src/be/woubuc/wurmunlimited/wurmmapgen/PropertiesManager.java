@@ -35,20 +35,19 @@ public class PropertiesManager {
 	
 	/**
 	 * Loads the properties from the file WurmMapGen.properties
-	 * @param  propertiesFilePath  The path of the properties file to load
+	 * @param  propertiesFilePath  The path of the properties file to openDatabaseConnections
 	 * @return true if the properties were loaded successfully
 	 */
 	public boolean load(Path propertiesFilePath) {
-		System.out.println();
-		System.out.println("Properties");
+		System.out.println("\nProperties");
 		
 		// Load properties file
 		Properties properties = new Properties();
 		try (InputStream input = new FileInputStream(propertiesFilePath.toAbsolutePath().toString())) {
-			System.out.println("      loading properties file");
+			System.out.println("      Loading properties file");
 			properties.load(input);
 		} catch (Exception e) {
-			System.err.println("ERROR could not load properties: " + e.getMessage());
+			System.err.println("ERROR Could not openDatabaseConnections properties: " + e.getMessage());
 			return false;
 		}
 		
@@ -57,12 +56,12 @@ public class PropertiesManager {
 		
 		// Verify that the default settings have been changed
 		if (mapLocation.equals("C:/location/to/map/folder") || saveLocation.equals("C:/location/to/save/folder")) {
-			System.err.println("ERROR you are using default map or save location, please edit your properties file");
+			System.err.println("ERROR You are using default map or save location, please edit your properties file");
 			return false;
 		}
 		
-		System.out.println("      map location: " + mapLocation);
-		System.out.println("      save location: " + saveLocation);
+		System.out.println("      Map path: " + mapLocation);
+		System.out.println("      Save path: " + saveLocation);
 		
 		this.serverName = properties.getProperty("serverName");
 		
@@ -90,10 +89,12 @@ public class PropertiesManager {
 		this.saveLocation = new File(saveLocation);
 		
 		if (this.markerType < 1 || this.markerType > 3) {
-			System.out.println("ERROR deed marker type should be between 1 - 3");
+			System.out.println("ERROR Marker type should be a number between 1 - 3");
 			return false;
 		}
-
+		
+		System.out.println("      Verbose logging " + (verbose ? "enabled" : "disabled"));
+		System.out.println("   OK Loaded properties");
 		return true;
 	}
 }
