@@ -7,3 +7,5 @@
 dist
 lib
 out
+
+!src/resources/template/dist
