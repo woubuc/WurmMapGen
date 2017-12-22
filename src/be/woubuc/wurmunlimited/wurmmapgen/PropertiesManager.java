@@ -1,8 +1,9 @@
-package com.imraginbro.wurm.mapgen;
+package be.woubuc.wurmunlimited.wurmmapgen;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Properties;
 
 public class PropertiesManager {
@@ -34,17 +35,17 @@ public class PropertiesManager {
 	
 	/**
 	 * Loads the properties from the file WurmMapGen.properties
+	 * @param  propertiesFilePath  The path of the properties file to load
 	 * @return true if the properties were loaded successfully
 	 */
-	public boolean load() {
+	public boolean load(Path propertiesFilePath) {
 		System.out.println();
 		System.out.println("Properties");
-		String propertiesFile = "./WurmMapGen.properties";
 		
 		// Load properties file
 		Properties properties = new Properties();
-		try (InputStream input = new FileInputStream(propertiesFile)) {
-			System.out.println("      loading properties file " + propertiesFile);
+		try (InputStream input = new FileInputStream(propertiesFilePath.toAbsolutePath().toString())) {
+			System.out.println("      loading properties file");
 			properties.load(input);
 		} catch (Exception e) {
 			System.err.println("ERROR could not load properties: " + e.getMessage());

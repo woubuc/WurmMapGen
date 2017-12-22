@@ -1,6 +1,6 @@
-package com.imraginbro.wurm.mapgen.filegen;
+package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
-import com.imraginbro.wurm.mapgen.MapBuilder;
+import be.woubuc.wurmunlimited.wurmmapgen.MapBuilder;
 import org.json.simple.JSONObject;
 
 import java.io.FileWriter;

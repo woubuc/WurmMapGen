@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: com.imraginbro.wurm.mapgen.MapGen
-Main-Class: com.imraginbro.wurm.mapgen.MapGen
+Class-Path: be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen
+Main-Class: be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen
 

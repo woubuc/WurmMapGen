@@ -1,10 +1,11 @@
-package com.imraginbro.wurm.mapgen;
+package be.woubuc.wurmunlimited.wurmmapgen;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,7 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
-import com.imraginbro.wurm.mapgen.filegen.FileGen;
+import be.woubuc.wurmunlimited.wurmmapgen.filegen.FileGen;
 import com.wurmonline.mesh.MeshIO;
 import com.wurmonline.mesh.Tiles;
 import com.wurmonline.mesh.Tiles.Tile;
@@ -31,12 +32,21 @@ public class MapBuilder {
 	private final static FileGen fileGenerator = new FileGen();
 
 	public static MeshIO map;
-
-	public MapBuilder() throws Exception {
-		if (!propertiesManager.load()) {
-			return;
+	
+	/**
+	 * Initialises the map builder
+	 * @param  propertiesFilePath  Path to the properties file that should be used
+	 */
+	public MapBuilder(Path propertiesFilePath) throws Exception {
+		if (!propertiesManager.load(propertiesFilePath)) {
+			throw new Exception("Could not load properties");
 		}
-		
+	}
+	
+	/**
+	 * Builds the map
+	 */
+	public void buildMap() throws Exception {
 		fileManager.load();
 		fileManager.makeTempCopies();
 		fileManager.relocateFileVars();

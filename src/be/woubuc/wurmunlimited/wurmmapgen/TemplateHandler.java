@@ -1,4 +1,4 @@
-package com.imraginbro.wurm.mapgen;
+package be.woubuc.wurmunlimited.wurmmapgen;
 
 import com.samskivert.mustache.Mustache;
 import org.apache.commons.io.FileUtils;

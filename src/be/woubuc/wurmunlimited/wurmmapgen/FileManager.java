@@ -1,4 +1,4 @@
-package com.imraginbro.wurm.mapgen;
+package be.woubuc.wurmunlimited.wurmmapgen;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

@@ -1,10 +1,10 @@
-package com.imraginbro.wurm.mapgen.filegen;
+package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import com.imraginbro.wurm.mapgen.MapBuilder;
+import be.woubuc.wurmunlimited.wurmmapgen.MapBuilder;
 
 public class FileGen {
 	
