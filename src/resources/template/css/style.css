@@ -25,6 +25,9 @@ h1 { font-size:14px; font-weight:700; }
 #playercount { font-size:12px; color:#888; }
 label { display:block; padding:10px 0; cursor:pointer; }
 
+.attribution { font-size:11px; color:#888; }
+.attribution p { padding:2px 0; }
+
 /* Map labels */
 .icon-textlabel { width:0px; height:1px; border:5px solid transparent; border-top-color:rgba(0,0,0,0.6);
 	white-space:nowrap; text-align:center; font-size:10px; }
@@ -33,7 +36,7 @@ label { display:block; padding:10px 0; cursor:pointer; }
 	background:rgba(0,0,0,0.6); color:white; border-radius:3px; }
 
 /* Basic GUI elements */
-#sidebar { height:100vh; width:240px; left:-240px; background:white; }
+#sidebar { height:100vh; width:240px; left:-240px; background:white; overflow-y:auto; }
 #sidebar-toggle { left:0; top:10px; width:40px; height:44px; line-height:43px;
 	background:white;  border-radius:0 3px 3px 0; box-shadow:0 0 5px rgba(0,0,0,0.1);
 	font-size:20px; text-align:center; cursor:pointer; }

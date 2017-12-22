@@ -17,10 +17,12 @@ WurmMapGen.map = {
 		// Set up the map
 		var map = WurmMapGen.map.map = L.map('map', {
 			maxBounds: [xy(0,0), xy(config.actualMapSize,config.actualMapSize)],
+			maxBoundsViscosity: 1.0,
 			maxZoom: config.mapMaxZoom,
 			minZoom: config.mapMinZoom,
 			crs: L.CRS.Simple,
-			zoomControl: false
+			zoomControl: false,
+			attributionControl: false
 		});
 
 		new L.Control.Zoom({position: 'bottomright'}).addTo(map);
@@ -41,7 +43,6 @@ WurmMapGen.map = {
 			maxBounds: mapBounds,
 			maxBoundsViscosity: 1.0,
 			inertia: false,
-			attribution: 'Rendered with <a href="https://github.com/Garrett92/WurmMapGen">WurmMapGen</a>',
 			noWrap: true,
 			tms: false
 		}).addTo(map);
