@@ -1,3 +1,11 @@
+WurmMapGen v2.2.0
+-----------------
+Added:   Select properties file using CLI argument "-c yourfile.properties"
+Added:   Map shading modifier to adjust elevation shading
+Added:   Map tile size setting
+Changed: Reworked map generation class for more flexible image generation
+Changed: Small GUI tweaks & updated attribution text
+
 WurmMapGen v2.1.0-rc2
 ---------------------
 Added:   Search results now have icons to indicate the type of marker
