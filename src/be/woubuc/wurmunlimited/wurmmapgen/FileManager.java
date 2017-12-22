@@ -2,20 +2,11 @@ package be.woubuc.wurmunlimited.wurmmapgen;
 
 import org.apache.commons.io.FileUtils;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
-import javax.imageio.stream.ImageOutputStream;
 
 public class FileManager {
 	
@@ -69,20 +60,6 @@ public class FileManager {
 		
 		FileUtils.deleteDirectory(tempDir.toFile());
 		System.out.println("   OK Directory deleted");
-	}
-	
-	public void saveToFile(BufferedImage newImg, File file) throws IOException {
-		ImageWriter writer = null;
-		Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("png");
-		if (iter.hasNext()) {
-			writer = (ImageWriter)iter.next();
-		}
-		ImageOutputStream ios = ImageIO.createImageOutputStream(file);
-		writer.setOutput(ios);
-		ImageWriteParam param = new JPEGImageWriteParam(java.util.Locale.getDefault());
-		param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT) ;
-		param.setCompressionQuality(1f);
-		writer.write(null, new IIOImage( newImg, null, null ), param);
 	}
 	
 	/**
