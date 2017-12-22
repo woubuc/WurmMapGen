@@ -24,7 +24,9 @@ public class PropertiesManager {
 	public Boolean verbose = false;
 	
 	public int mapGeneratorThreads = 2;
+	public int mapTileSize = 256;
 	
+	public float mapShadingModifier = 1.0f;
 	public Boolean mapGenerateShading = true;
 	public Boolean mapShadePaths = true;
 	public Boolean mapGenerateWater = true;
@@ -79,6 +81,9 @@ public class PropertiesManager {
 		this.verbose = Boolean.parseBoolean(properties.getProperty("verbose", Boolean.toString(this.verbose)));
 		
 		this.mapGeneratorThreads = Integer.parseInt(properties.getProperty("mapGeneratorThreads", Integer.toString(this.mapGeneratorThreads)));
+		this.mapTileSize = Integer.parseInt(properties.getProperty("mapTileSize", Integer.toString(this.mapTileSize)));
+		
+		this.mapShadingModifier = Float.parseFloat(properties.getProperty("mapShadingModifier", Float.toString(this.mapShadingModifier)));
 		
 		this.mapGenerateShading = Boolean.parseBoolean(properties.getProperty("mapGenerateShading", Boolean.toString(this.mapGenerateShading)));
 		this.mapShadePaths = Boolean.parseBoolean(properties.getProperty("mapShadePaths", Boolean.toString(this.mapShadePaths)));

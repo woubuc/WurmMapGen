@@ -2,6 +2,7 @@
 *.jar
 *.iml
 *.dev.properties
+*.afdesign
 
 .idea
 dist
