@@ -24,14 +24,14 @@ public class ConfigFileGen {
 		int minZoom = 0;
 		
 		int count = 0;
-		for (int i = mapSize; i > 256; i++) {
+		for (int i = mapSize; i > WurmMapGen.properties.mapTileSize; i++) {
 			i = (i/2);
 			nativeZoom = count;
 			count++;
 		}
 		
 		count = 0;
-		for (int i = maxMapSize; i > 256; i++) {
+		for (int i = maxMapSize; i > WurmMapGen.properties.mapTileSize; i++) {
 			i = (i/2);
 			maxZoom = count;
 			count++;
@@ -47,6 +47,7 @@ public class ConfigFileGen {
 		config.put("mapMaxZoom", maxZoom);
 		config.put("actualMapSize", mapSize);
 		config.put("maxMapSize", maxMapSize);
+		config.put("mapTileSize", WurmMapGen.properties.mapTileSize);
 		
 		config.put("markerType", WurmMapGen.properties.markerType);
 		

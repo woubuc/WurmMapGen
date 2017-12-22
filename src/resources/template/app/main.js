@@ -63,7 +63,7 @@ Promise.all(promises)
 })
 .then(function() {
 	// Add computed config values
-	WurmMapGen.config.xyMulitiplier = (WurmMapGen.config.actualMapSize / 256);
+	WurmMapGen.config.xyMulitiplier = (WurmMapGen.config.actualMapSize / WurmMapGen.config.mapTileSize);
 
 	// Create the map
 	WurmMapGen.map.create();
