@@ -31,7 +31,8 @@ public class FileManager {
 	 * Loads all required files and makes copies in a temp directory
 	 */
 	public void load() throws IOException {
-		System.out.println("\nCreate temp file copies");
+		System.out.println();
+		System.out.println("Create temp file copies");
 		final long startTime = System.currentTimeMillis();
 		
 		Files.createDirectories(tempDir);
@@ -56,7 +57,8 @@ public class FileManager {
 	 * Unloads the files and deletes the previously created temporary files
 	 */
 	public void unload() throws IOException {
-		System.out.println("\nRemove temp file copies");
+		System.out.println();
+		System.out.println("Remove temp file copies");
 		
 		FileUtils.deleteDirectory(tempDir.toFile());
 		System.out.println("   OK Directory deleted");

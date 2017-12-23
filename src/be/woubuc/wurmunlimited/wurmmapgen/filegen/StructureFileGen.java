@@ -25,7 +25,7 @@ public class StructureFileGen {
 		JSONObject dataObject = new JSONObject();
 		JSONArray data = new JSONArray();
 		
-		if (WurmMapGen.properties.verbose) System.out.println("      loading structures from wurmzones.db");
+		if (WurmMapGen.properties.verbose) System.out.println("      Loading structures from wurmzones.db");
 		Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT WURMID FROM STRUCTURES WHERE FINISHED='1';");
 		
@@ -63,19 +63,19 @@ public class StructureFileGen {
 		statement.close();
 		
 		if (count == 0) {
-			System.out.println(" SKIP no structures found");
+			System.out.println(" SKIP No structures found");
 			return;
 		}
 		
 		dataObject.put("structures", data);
 		
 		// Write JSON data to file
-		if (WurmMapGen.properties.verbose) System.out.println("      writing data/structures.json");
+		if (WurmMapGen.properties.verbose) System.out.println("      Writing data/structures.json");
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();
 		
-		System.out.println("   OK added " + count + " entries to structures.json");
+		System.out.println("   OK Added " + count + " entries to structures.json");
 	}
 	
 	/**

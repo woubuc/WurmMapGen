@@ -38,7 +38,7 @@ public class VillageFileGen {
 		
 		// Stop right here if there are no villages on the server
 		if (villages.size() == 0) {
-			System.out.println(" SKIP no villages found");
+			System.out.println(" SKIP No villages found");
 			return;
 		}
 		
@@ -75,13 +75,13 @@ public class VillageFileGen {
 		dataObject.put("villages", data);
 		
 		// Write JSON data to file
-		if (WurmMapGen.properties.verbose) System.out.println("      creating data/villages.json");
+		if (WurmMapGen.properties.verbose) System.out.println("      Creating data/villages.json");
 		String filePath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "villages.json").toString();
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();
 		
-		System.out.println("   OK added " + villages.size() + " entries to villages.json");
+		System.out.println("   OK Added " + villages.size() + " entries to villages.json");
 	}
 	
 	/**

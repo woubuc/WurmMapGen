@@ -23,7 +23,7 @@ public class GuardTowerFileGen {
 		System.out.println();
 		System.out.println("Guard tower data");
 		
-		if (WurmMapGen.properties.verbose) System.out.println("      loading guard towers from wurmitems.db");
+		if (WurmMapGen.properties.verbose) System.out.println("      Loading guard towers from wurmitems.db");
 		Statement statement = WurmMapGen.db.getItems().getConnection().createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT * FROM ITEMS WHERE (TEMPLATEID='384' OR TEMPLATEID='430' OR TEMPLATEID='528' OR TEMPLATEID='638' OR TEMPLATEID='996') AND CREATIONSTATE='0';");
 		
@@ -40,7 +40,7 @@ public class GuardTowerFileGen {
 		statement.close();
 		
 		if (guardTowers.size() == 0) {
-			System.out.println(" SKIP no guard towers found");
+			System.out.println(" SKIP No guard towers found");
 			return;
 		}
 		
@@ -76,12 +76,12 @@ public class GuardTowerFileGen {
 		dataObject.put("guardtowers", data);
 		
 		// Write JSON data to file
-		if (WurmMapGen.properties.verbose) System.out.println("      creating data/guardtowers.json");
+		if (WurmMapGen.properties.verbose) System.out.println("      Creating data/guardtowers.json");
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();
 		
-		System.out.println("   OK added " + guardTowers.size() + " entries to guardtowers.json");
+		System.out.println("   OK Added " + guardTowers.size() + " entries to guardtowers.json");
 	}
 	
 	/**

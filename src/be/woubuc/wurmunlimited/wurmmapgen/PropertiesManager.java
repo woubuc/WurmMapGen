@@ -41,7 +41,8 @@ public class PropertiesManager {
 	 * @return true if the properties were loaded successfully
 	 */
 	public boolean load(Path propertiesFilePath) {
-		System.out.println("\nProperties");
+		System.out.println();
+		System.out.println("Properties");
 		
 		// Load properties file
 		Properties properties = new Properties();

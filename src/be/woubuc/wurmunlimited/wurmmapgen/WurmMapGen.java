@@ -31,7 +31,8 @@ public class WurmMapGen {
 			}
 		}
 		
-		System.out.println("\nUsing properties file: " + propertiesFilePath.toAbsolutePath());
+		System.out.println();
+		System.out.println("Using properties file: " + propertiesFilePath.toAbsolutePath());
 		System.out.println("      To use a different file: -c yourfile.properties");
 		
 		// Allow for users to try something like -h or -help and just get the above info without running the mapgen
@@ -63,7 +64,8 @@ public class WurmMapGen {
 		fileManager.unload();
 		
 		
-		System.out.println("\nMap generated");
+		System.out.println();
+		System.out.println("Map generated");
 		System.out.println("      Duration: " + (System.currentTimeMillis() - startTime) + " ms");
 	}
 }

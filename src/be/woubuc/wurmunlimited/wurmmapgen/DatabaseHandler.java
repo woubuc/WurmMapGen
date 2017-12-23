@@ -20,7 +20,8 @@ public class DatabaseHandler {
 	 * Opens all required database connections
 	 */
 	public boolean openDatabaseConnections() {
-		System.out.println("\nOpen db connections");
+		System.out.println();
+		System.out.println("Open db connections");
 		
 		// Create connections
 		zones = new WurmDatabaseConnection(WurmMapGen.fileManager.db_wurmZones);
@@ -44,7 +45,8 @@ public class DatabaseHandler {
 	 * Closes the open database connections
 	 */
 	public boolean closeDatabaseConnections() {
-		System.out.println("\nClose db connections");
+		System.out.println();
+		System.out.println("Close db connections");
 		
 		try {
 			zones.disconnect();
@@ -79,7 +81,7 @@ public class DatabaseHandler {
 		 * Gets connection status
 		 * @return  true if the connection is connected
 		 */
-		public boolean isConnected() {
+		boolean isConnected() {
 			if (connection == null) return false;
 			
 			try {

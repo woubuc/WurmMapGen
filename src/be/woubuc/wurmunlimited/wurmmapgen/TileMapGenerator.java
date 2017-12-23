@@ -12,7 +12,6 @@ import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,7 +27,6 @@ public class TileMapGenerator {
 	
 	private ExecutorService executor;
 	
-	private final String separator = File.separator;
 	private int runningThreadsCount = 0;
 	
 	// Which tile types are seen as "path"
@@ -49,7 +47,8 @@ public class TileMapGenerator {
 	 * Opens the MeshIO connection required for the map builder
 	 */
 	public void openMap() throws IOException {
-		System.out.println("\nOpening Wurm MeshIO connection");
+		System.out.println();
+		System.out.println("Open Wurm MeshIO connection");
 		map = MeshIO.open(WurmMapGen.fileManager.map_topLayer.getAbsolutePath());
 		if (WurmMapGen.properties.verbose) System.out.println("   OK Connection opened");
 	}
@@ -58,7 +57,8 @@ public class TileMapGenerator {
 	 * Closes the MeshIO connection
 	 */
 	public void closeMap() throws IOException {
-		if (WurmMapGen.properties.verbose) System.out.println("\nClose Wurm MeshIO connection");
+		System.out.println();
+		if (WurmMapGen.properties.verbose) System.out.println("Close Wurm MeshIO connection");
 		map.close();
 		if (WurmMapGen.properties.verbose) System.out.println("   OK Connection closed");
 	}
@@ -67,7 +67,8 @@ public class TileMapGenerator {
 	 * Generates the map tile images
 	 */
 	public void generateMapTiles() {
-		System.out.println("\nMap generation");
+		System.out.println();
+		System.out.println("Map generation");
 		final long startTime = System.currentTimeMillis();
 		
 		Path imagesDirectory = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "images");

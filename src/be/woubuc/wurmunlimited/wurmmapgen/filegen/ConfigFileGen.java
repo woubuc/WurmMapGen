@@ -14,7 +14,8 @@ public class ConfigFileGen {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void generateConfigFile() throws IOException {
-		System.out.println("\nJSON Config data");
+		System.out.println();
+		System.out.println("JSON Config data");
 		
 		// Prepare config variables
 		int mapSize = WurmMapGen.tileMapGenerator.map.getSize();
@@ -70,7 +71,8 @@ public class ConfigFileGen {
 	 * Generates a config file to be used in the PHP code necessary to connect to the RMI interface
 	 */
 	public static void generatePhpConfigFile() throws IOException {
-		System.out.println("\nPHP config data");
+		System.out.println();
+		System.out.println("PHP config data");
 		
 		if (WurmMapGen.properties.verbose) System.out.println("      Creating includes/config.php");
 		String filePath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "includes", "config.php").toString();
