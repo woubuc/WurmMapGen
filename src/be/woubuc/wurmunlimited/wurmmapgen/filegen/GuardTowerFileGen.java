@@ -6,11 +6,14 @@ import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GuardTowerFileGen {
 	
@@ -19,13 +22,31 @@ public class GuardTowerFileGen {
 	 * @param filePath The destination file
 	 */
 	@SuppressWarnings("unchecked")
-	public void generateGuardTowerFile(String filePath) throws IOException, SQLException {
+	public static void generateGuardTowerFile(String filePath) throws IOException, SQLException {
 		System.out.println();
 		System.out.println("Guard tower data");
 		
+		List<Integer> towerIds = new ArrayList(Arrays.asList(384, 430, 528, 638, 996));
+		if (WurmMapGen.db.getModSupport() != null) {
+			if (WurmMapGen.properties.verbose) System.out.println("      Loading modded guard tower IDs");
+			towerIds.addAll(loadModdedTowerIds());
+		}
+		
 		if (WurmMapGen.properties.verbose) System.out.println("      Loading guard towers from wurmitems.db");
-		Statement statement = WurmMapGen.db.getItems().getConnection().createStatement();
-		ResultSet resultSet = statement.executeQuery("SELECT * FROM ITEMS WHERE (TEMPLATEID='384' OR TEMPLATEID='430' OR TEMPLATEID='528' OR TEMPLATEID='638' OR TEMPLATEID='996') AND CREATIONSTATE='0';");
+		
+		StringBuilder query = new StringBuilder();
+		query.append("select LASTOWNERID, POSX, POSY, QUALITYLEVEL, DAMAGE from ITEMS where (");
+		for (int i = 0; i < towerIds.size() - 1; i++) {
+			query.append("TEMPLATEID = ? or ");
+		}
+		query.append("TEMPLATEID = ?) and CREATIONSTATE = 0");
+		
+		PreparedStatement statement = WurmMapGen.db.getItems().getConnection().prepareStatement(query.toString());
+		for (int i = 0; i < towerIds.size(); i++) {
+			statement.setInt(i + 1, towerIds.get(i));
+		}
+		
+		ResultSet resultSet = statement.executeQuery();
 		
 		ArrayList<GuardTower> guardTowers = new ArrayList<>();
 		
@@ -85,15 +106,36 @@ public class GuardTowerFileGen {
 	}
 	
 	/**
-	 * Describes a guard tower in the db
+	 * Loads modded tower template IDs from the modsupport database and adds them to a list
+	 * @return The modded IDs list
 	 */
-	private class GuardTower {
+	private static List<Integer> loadModdedTowerIds() throws SQLException {
+		List<Integer> list = new ArrayList<>();
+		
+		Statement statement = WurmMapGen.db.getModSupport().getConnection().createStatement();
+		ResultSet resultSet = statement.executeQuery("select ID from IDS where " +
+				"NAME = 'org.takino.tower.Jenn-Kellon' or " +
+				"NAME = 'org.takino.tower.Mol-Rehan' or " +
+				"NAME = 'org.takino.tower.Horde of the Summoned' " +
+				";");
+		
+		while (resultSet.next()) {
+			list.add(resultSet.getInt("ID"));
+		}
+		
+		return list;
+	}
+	
+	/**
+	 * Describes a guard tower in the database
+	 */
+	private static class GuardTower {
 		
 		private final int x;
 		private final int y;
 		
-		private final long ownerID;
 		private String ownerName;
+		private final long ownerID;
 		
 		private final float ql;
 		private final float dmg;
@@ -107,11 +149,11 @@ public class GuardTowerFileGen {
 		
 		/**
 		 * Initialises a guard tower
-		 * @param ownerID ID of the guard tower's owner
-		 * @param x       The x coordinate of the tower
-		 * @param y       The y coordinate of the tower
-		 * @param ql      The item quality level
-		 * @param dmg     The total damage of the tower
+		 * @param  ownerID  ID of the guard tower's owner
+		 * @param  x        The x coordinate of the tower
+		 * @param  y        The y coordinate of the tower
+		 * @param  ql       The item quality level
+		 * @param  dmg      The total damage of the tower
 		 */
 		GuardTower(long ownerID, int x, int y, float ql, float dmg) {
 			this.ownerID = ownerID;
@@ -130,34 +172,47 @@ public class GuardTowerFileGen {
 			populateOwnerName();
 		}
 		
-		String getOwnerName() { return this.ownerName; }
+		String getOwnerName() { return ownerName; }
 		
-		int getX() { return this.x; }
-		int getY() { return this.y; }
+		int getX() { return x; }
+		int getY() { return y; }
 		
-		int getMinX() { return this.minX; }
-		int getMaxX() { return this.maxX; }
-		int getMinY() { return this.minY; }
-		int getMaxY() { return this.maxY; }
+		int getMinX() { return minX; }
+		int getMaxX() { return maxX; }
+		int getMinY() { return minY; }
+		int getMaxY() { return maxY; }
 		
-		float getQl() { return this.ql; }
-		float getDmg() { return this.dmg; }
+		float getQl() { return ql; }
+		float getDmg() { return dmg; }
 		
 		/**
 		 * Loads the name of the tower's owner from the db
 		 */
 		private void populateOwnerName() {
-			try (Statement statement = WurmMapGen.db.getPlayers().getConnection().createStatement();
-				 ResultSet result = statement.executeQuery("SELECT NAME FROM PLAYERS WHERE WURMID='"+this.ownerID+"';")) {
+			try (PreparedStatement statement = createPopulateOwnerNameStatement();
+				 ResultSet result = statement.executeQuery()) {
 				
 				if (result.next()) {
-					this.ownerName = result.getString("NAME");
+					ownerName = result.getString("NAME");
 				}
 				
 			} catch(SQLException e) {
 				System.out.println("[ERROR] " + e.getMessage());
 				e.printStackTrace();
 			}
+		}
+		
+		/**
+		 * Creates the prepared statement for the populateOwnerName method
+		 * @see GuardTower#populateOwnerName()
+		 * @return The statement
+		 */
+		private PreparedStatement createPopulateOwnerNameStatement() throws SQLException {
+			PreparedStatement statement = WurmMapGen.db.getPlayers().getConnection()
+					.prepareStatement("select NAME from PLAYERS where WURMID = ?");
+			
+			statement.setLong(1, ownerID);
+			return statement;
 		}
 	}
 }
