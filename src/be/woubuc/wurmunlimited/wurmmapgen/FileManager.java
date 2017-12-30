@@ -17,6 +17,8 @@ public class FileManager {
 	public DatabaseFile db_wurmItems;
 	public DatabaseFile db_wurmPlayers;
 	
+	public DatabaseFile db_modSupport = null;
+	
 	private Path tempDir;
 	
 	/**
@@ -40,15 +42,25 @@ public class FileManager {
 		
 		if (WurmMapGen.properties.verbose) { System.out.println("      Loading required files"); }
 		map_topLayer = new WurmFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "top_layer.map"));
+		
 		db_wurmZones = new DatabaseFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "sqlite", "wurmzones.db"));
 		db_wurmItems = new DatabaseFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "sqlite", "wurmitems.db"));
 		db_wurmPlayers = new DatabaseFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "sqlite", "wurmplayers.db"));
+		
+		Path modSupportPath = Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "sqlite", "modsupport.db");
+		if (modSupportPath.toFile().exists()) {
+			db_modSupport = new DatabaseFile(modSupportPath);
+		}
 		
 		if (WurmMapGen.properties.verbose) { System.out.println("      Copying files to temp directory"); }
 		map_topLayer = map_topLayer.copyToDirectory(tempDir);
 		db_wurmZones = db_wurmZones.copyToDirectory(tempDir);
 		db_wurmItems = db_wurmItems.copyToDirectory(tempDir);
 		db_wurmPlayers = db_wurmPlayers.copyToDirectory(tempDir);
+		
+		if (db_modSupport != null) {
+			db_modSupport = db_modSupport.copyToDirectory(tempDir);
+		}
 		
 		System.out.println("   OK Temp files copied in " + (System.currentTimeMillis() - startTime) + "ms");
 	}

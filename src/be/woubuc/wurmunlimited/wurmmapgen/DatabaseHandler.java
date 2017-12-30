@@ -12,9 +12,12 @@ public class DatabaseHandler {
 	private WurmDatabaseConnection items;
 	private WurmDatabaseConnection players;
 	
+	private WurmDatabaseConnection modSupport = null;
+	
 	public WurmDatabaseConnection getZones() { return zones; }
 	public WurmDatabaseConnection getItems() { return items; }
 	public WurmDatabaseConnection getPlayers() { return players; }
+	public WurmDatabaseConnection getModSupport() { return modSupport; }
 	
 	/**
 	 * Opens all required database connections
@@ -28,11 +31,16 @@ public class DatabaseHandler {
 		items = new WurmDatabaseConnection(WurmMapGen.fileManager.db_wurmItems);
 		players = new WurmDatabaseConnection(WurmMapGen.fileManager.db_wurmPlayers);
 		
+		if (WurmMapGen.fileManager.db_modSupport != null) {
+			modSupport = new WurmDatabaseConnection(WurmMapGen.fileManager.db_modSupport);
+		}
+		
 		// Connect to the db files
 		try {
 			zones.connect();
 			items.connect();
 			players.connect();
+			if (modSupport != null) modSupport.connect();
 		} catch (Exception e) {
 			System.err.println("ERROR Could not connect: " + e.getMessage());
 			return false;
@@ -52,6 +60,7 @@ public class DatabaseHandler {
 			zones.disconnect();
 			items.disconnect();
 			players.disconnect();
+			if (modSupport != null) modSupport.disconnect();
 		} catch (Exception e) {
 			System.err.println("ERROR Could not close connection: " + e.getMessage());
 			return false;
