@@ -2,21 +2,17 @@ package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
 import be.woubuc.wurmunlimited.wurmmapgen.Logger;
 import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
-
-import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-public class PortalFileGen {
+public final class PortalFileGen extends FileGen {
+	
 	
 	// The template IDs of all portal objects
 	private static List<Integer> portalIds = Arrays.asList(
@@ -24,12 +20,14 @@ public class PortalFileGen {
 			4002, 4003, 4004, 4010, 4011, 4015 // New portals mod
 			);
 	
-	/**
-	 * Generates a JSON file containing all portals in the database
-	 * @param  filePath  The output file
-	 */
+	// Set portals.json filename
+	public PortalFileGen() {
+		setFileName("portals.json");
+	}
+	
+	@Override
 	@SuppressWarnings("unchecked")
-	public static void generatePortalFile(String filePath) throws IOException {
+	protected String generateData() {
 		Logger.title("Portal data");
 		
 		// Prepare JSON objects
@@ -39,6 +37,7 @@ public class PortalFileGen {
 		Logger.details("Loading portals from wurmitems.db");
 		try (PreparedStatement statement = createStatement();
 			 ResultSet resultSet = statement.executeQuery()) {
+			
 			JSONObject portalData;
 			
 			while (resultSet.next()) {
@@ -52,18 +51,11 @@ public class PortalFileGen {
 			}
 		} catch (SQLException e) {
 			Logger.error("Could not load portals: " + e.getMessage());
-			return;
+			return null;
 		}
 		
 		dataObject.put("portals", data);
-		
-		// Write JSON data to file
-		Logger.details("Creating " + filePath);
-		FileWriter writer = new FileWriter(filePath, false);
-		writer.write(dataObject.toJSONString());
-		writer.close();
-		
-		Logger.ok(String.format("Added %d entries to file %s", data.size(), FilenameUtils.getName(filePath)));
+		return dataObject.toJSONString();
 	}
 	
 	/**

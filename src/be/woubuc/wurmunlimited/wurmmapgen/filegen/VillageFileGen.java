@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class VillageFileGen {
+public class VillageFileGen { // TODO extend FileGen base class
 	
 	/**
 	 * Generates a JSON file containing all villages on the server, and writes it to the given file path.

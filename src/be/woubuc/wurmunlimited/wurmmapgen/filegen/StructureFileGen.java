@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class StructureFileGen {
+public class StructureFileGen { // TODO extend FileGen base class
 	
 	/**
 	 * Generates a JSON file containing all structures on the server, and writes it to the given file path.

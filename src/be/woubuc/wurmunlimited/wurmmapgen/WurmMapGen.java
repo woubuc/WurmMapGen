@@ -92,8 +92,14 @@ public class WurmMapGen {
 		final StructureFileGen structureFileGen = new StructureFileGen();
 		final GuardTowerFileGen guardTowerFileGen = new GuardTowerFileGen();
 		
-		ConfigFileGen.generateConfigFile();
-		ConfigFileGen.generatePhpConfigFile();
+		String dataPath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data").toString();
+		String phpPath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "includes").toString();
+		
+		ConfigFileGen configFileGen = new ConfigFileGen();
+		configFileGen.generateFile(dataPath);
+		
+		PhpConfigFileGen phpConfigFileGen = new PhpConfigFileGen();
+		phpConfigFileGen.generateFile(phpPath);
 		
 		if (WurmMapGen.properties.showDeeds) {
 			villageFileGen.generateVillageFile();
@@ -107,8 +113,9 @@ public class WurmMapGen {
 			guardTowerFileGen.generateGuardTowerFile(Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "guardtowers.json").toString());
 		}
 		
-		Path portalFile = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "portal.json");
-		PortalFileGen.generatePortalFile(portalFile.toString());
+		PortalFileGen portalFileGen = new PortalFileGen();
+		portalFileGen.generateFile(dataPath);
+		
 		
 		if (!db.closeDatabaseConnections()) return;
 		

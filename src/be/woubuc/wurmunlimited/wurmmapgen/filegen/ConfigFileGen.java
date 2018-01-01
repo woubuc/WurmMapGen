@@ -4,17 +4,19 @@ import be.woubuc.wurmunlimited.wurmmapgen.Logger;
 import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
 import org.json.simple.JSONObject;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Paths;
-
-public class ConfigFileGen {
+public final class ConfigFileGen extends FileGen {
+	
+	// Set config.json filename
+	public ConfigFileGen() {
+		setFileName("config.json");
+	}
 	
 	/**
-	 * Generates a config file
+	 * Generates the config file data
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
-	public static void generateConfigFile() throws IOException {
+	protected String generateData() {
 		Logger.title("JSON Config data");
 		
 		// Prepare config variables
@@ -58,30 +60,6 @@ public class ConfigFileGen {
 		
 		configObject.put("config", config);
 		
-		Logger.details("Creating data/config.json");
-		String filePath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "config.json").toString();
-		FileWriter writer = new FileWriter(filePath, false);
-		writer.write(configObject.toJSONString());
-		writer.close();
-		
-		Logger.ok("Wrote config data to config.json");
-	}
-	
-	/**
-	 * Generates a config file to be used in the PHP code necessary to connect to the RMI interface
-	 */
-	public static void generatePhpConfigFile() throws IOException {
-		Logger.title("PHP config data");
-		
-		Logger.details("Creating includes/config.php");
-		String filePath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "includes", "config.php").toString();
-		FileWriter writer = new FileWriter(filePath, false);
-		writer.write(String.format("<?php\n$conf_rmi_host = '%s';\n$conf_rmi_port = '%s';\n?>",
-				WurmMapGen.properties.rmiHost.replace("'", "\\'"),
-				WurmMapGen.properties.rmiPort.replace("'", "\\'")
-		));
-		writer.close();
-		
-		Logger.ok("Wrote config data to config.php");
+		return configObject.toJSONString();
 	}
 }

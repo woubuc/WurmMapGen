@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GuardTowerFileGen {
+public class GuardTowerFileGen { // TODO extend FileGen base class
 	
 	/**
 	 * Generates a JSON file containing all guard towers on the server, and writes it to the given file path.
