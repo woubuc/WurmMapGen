@@ -240,5 +240,8 @@ public class TileMapGenerator {
 		// Clear image buffer
 		imageTileGraphics.dispose();
 		imageTile.flush();
+		
+		// Tell JVM it should run garbage collection on the disposed image data
+		System.gc();
 	}
 }
