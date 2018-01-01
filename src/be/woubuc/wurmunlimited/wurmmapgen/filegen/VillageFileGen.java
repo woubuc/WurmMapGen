@@ -1,5 +1,6 @@
 package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
+import be.woubuc.wurmunlimited.wurmmapgen.Logger;
 import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -19,11 +20,10 @@ public class VillageFileGen {
 	 */
 	@SuppressWarnings("unchecked")
 	public void generateVillageFile() throws IOException, SQLException {
-		System.out.println();
-		System.out.println("Deeds data");
+		Logger.title("Village data");
 		
 		// Load list of villages
-		if (WurmMapGen.verbose) System.out.println("      Loading villages from wurmzones.db");
+		Logger.details("Loading villages from wurmzones.db");
 		Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT ID FROM VILLAGES WHERE DISBANDED=0;");
 		
@@ -38,7 +38,7 @@ public class VillageFileGen {
 		
 		// Stop right here if there are no villages on the server
 		if (villages.size() == 0) {
-			System.out.println(" SKIP No villages found");
+			Logger.custom("SKIP", "No villages found");
 			return;
 		}
 		
@@ -75,13 +75,13 @@ public class VillageFileGen {
 		dataObject.put("villages", data);
 		
 		// Write JSON data to file
-		if (WurmMapGen.verbose) System.out.println("      Creating data/villages.json");
+		Logger.details("Creating data/villages.json");
 		String filePath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "villages.json").toString();
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();
 		
-		System.out.println("   OK Added " + villages.size() + " entries to villages.json");
+		Logger.ok("Added " + villages.size() + " entries to villages.json");
 	}
 	
 	/**
@@ -157,7 +157,7 @@ public class VillageFileGen {
 				}
 				
 			} catch (SQLException e) {
-				System.out.println("ERROR " + e.getMessage());
+				Logger.error(e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -175,7 +175,7 @@ public class VillageFileGen {
 				}
 				
 			} catch (SQLException e) {
-				System.out.println("[ERROR] " + e.getMessage());
+				Logger.error(e.getMessage());
 				e.printStackTrace();
 			}
 			
@@ -202,12 +202,12 @@ public class VillageFileGen {
 							this.citizenCount++;
 						}
 					} catch (SQLException e) {
-						System.out.println("[ERROR] " + e.getMessage());
+						Logger.error(e.getMessage());
 						e.printStackTrace();
 					}
 				}
 			} catch (SQLException e) {
-				System.out.println("[ERROR] " + e.getMessage());
+				Logger.error(e.getMessage());
 				e.printStackTrace();
 			}
 			

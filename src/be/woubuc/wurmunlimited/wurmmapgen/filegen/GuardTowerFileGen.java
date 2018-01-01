@@ -1,5 +1,6 @@
 package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
+import be.woubuc.wurmunlimited.wurmmapgen.Logger;
 import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,17 +23,16 @@ public class GuardTowerFileGen {
 	 * @param filePath The destination file
 	 */
 	@SuppressWarnings("unchecked")
-	public static void generateGuardTowerFile(String filePath) throws IOException, SQLException {
-		System.out.println();
-		System.out.println("Guard tower data");
+	public void generateGuardTowerFile(String filePath) throws IOException, SQLException {
+		Logger.title("Guard tower data");
 		
 		List<Integer> towerIds = new ArrayList(Arrays.asList(384, 430, 528, 638, 996));
 		if (WurmMapGen.db.getModSupport() != null) {
-			if (WurmMapGen.verbose) System.out.println("      Loading modded guard tower IDs");
+			Logger.details("Loading modded guard tower IDs");
 			towerIds.addAll(loadModdedTowerIds());
 		}
 		
-		if (WurmMapGen.verbose) System.out.println("      Loading guard towers from wurmitems.db");
+		Logger.details("Loading guard towers from wurmitems.db");
 		
 		StringBuilder query = new StringBuilder();
 		query.append("select LASTOWNERID, POSX, POSY, QUALITYLEVEL, DAMAGE from ITEMS where (");
@@ -61,7 +61,7 @@ public class GuardTowerFileGen {
 		statement.close();
 		
 		if (guardTowers.size() == 0) {
-			System.out.println(" SKIP No guard towers found");
+			Logger.custom("SKIP", "No guard towers found");
 			return;
 		}
 		
@@ -97,12 +97,12 @@ public class GuardTowerFileGen {
 		dataObject.put("guardtowers", data);
 		
 		// Write JSON data to file
-		if (WurmMapGen.verbose) System.out.println("      Creating data/guardtowers.json");
+		Logger.details("Creating data/guardtowers.json");
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();
 		
-		System.out.println("   OK Added " + guardTowers.size() + " entries to guardtowers.json");
+		Logger.ok("Added " + guardTowers.size() + " entries to guardtowers.json");
 	}
 	
 	/**
@@ -197,7 +197,7 @@ public class GuardTowerFileGen {
 				}
 				
 			} catch(SQLException e) {
-				System.out.println("[ERROR] " + e.getMessage());
+				Logger.error(e.getMessage());
 				e.printStackTrace();
 			}
 		}

@@ -10,8 +10,6 @@ import java.nio.file.Paths;
 
 public class FileManager {
 	
-	final static String separator = java.io.File.separator;
-	
 	public WurmFile map_topLayer;
 	public DatabaseFile db_wurmZones;
 	public DatabaseFile db_wurmItems;
@@ -33,14 +31,12 @@ public class FileManager {
 	 * Loads all required files and makes copies in a temp directory
 	 */
 	public void load() throws IOException {
-		System.out.println();
-		System.out.println("Create temp file copies");
-		final long startTime = System.currentTimeMillis();
+		Logger.title("Create temp file copies");
 		
 		Files.createDirectories(tempDir);
-		if (WurmMapGen.verbose) { System.out.println("      Created directory " + tempDir.toString()); }
+		Logger.details("Created directory " + tempDir.toString());
 		
-		if (WurmMapGen.verbose) { System.out.println("      Loading required files"); }
+		Logger.details("Loading required files");
 		map_topLayer = new WurmFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "top_layer.map"));
 		
 		db_wurmZones = new DatabaseFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "sqlite", "wurmzones.db"));
@@ -52,7 +48,7 @@ public class FileManager {
 			db_modSupport = new DatabaseFile(modSupportPath);
 		}
 		
-		if (WurmMapGen.verbose) { System.out.println("      Copying files to temp directory"); }
+		Logger.details("Copying files to temp directory");
 		map_topLayer = map_topLayer.copyToDirectory(tempDir);
 		db_wurmZones = db_wurmZones.copyToDirectory(tempDir);
 		db_wurmItems = db_wurmItems.copyToDirectory(tempDir);
@@ -62,18 +58,17 @@ public class FileManager {
 			db_modSupport = db_modSupport.copyToDirectory(tempDir);
 		}
 		
-		System.out.println("   OK Temp files copied in " + (System.currentTimeMillis() - startTime) + "ms");
+		Logger.ok("Temp files copied");
 	}
 	
 	/**
 	 * Unloads the files and deletes the previously created temporary files
 	 */
 	public void unload() throws IOException {
-		System.out.println();
-		System.out.println("Remove temp file copies");
+		Logger.title("Remove temp file copies");
 		
 		FileUtils.deleteDirectory(tempDir.toFile());
-		System.out.println("   OK Directory deleted");
+		Logger.ok("Directory deleted");
 	}
 	
 	/**
@@ -94,20 +89,20 @@ public class FileManager {
 		 * @param  destination  The destination directory
 		 */
 		DatabaseFile copyToDirectory(Path destination) throws IOException {
-			if (WurmMapGen.verbose) { System.out.println("      -> " + this.getName()); }
+			Logger.details("-> " + this.getName());
 			
 			DatabaseFile dest = new DatabaseFile(Paths.get(destination.toString(), this.getName()));
 			FileUtils.copyFile((File) this, dest);
 			
 			File wal = new File(this.getAbsolutePath() + "-wal");
 			if (wal.exists()) {
-				if (WurmMapGen.verbose) { System.out.println("      -> " + wal.getName()); }
+				Logger.details("-> " + wal.getName());
 				FileUtils.copyFileToDirectory(wal, destination.toFile());
 			}
 			
 			File shm = new File(this.getAbsolutePath() + "-shm");
 			if (shm.exists()) {
-				if (WurmMapGen.verbose) { System.out.println("      -> " + shm.getName()); }
+				Logger.details("-> " + shm.getName());
 				FileUtils.copyFileToDirectory(shm, destination.toFile());
 			}
 			
@@ -133,7 +128,7 @@ public class FileManager {
 		 * @param  destination  The destination directory
 		 */
 		WurmFile copyToDirectory(Path destination) throws IOException {
-			if (WurmMapGen.verbose) { System.out.println("      -> " + this.getName()); }
+			Logger.details("-> " + this.getName());
 			
 			WurmFile dest = new WurmFile(Paths.get(destination.toString(), this.getName()));
 			FileUtils.copyFile((File) this, dest);

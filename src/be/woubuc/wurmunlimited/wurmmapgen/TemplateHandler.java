@@ -23,11 +23,10 @@ public class TemplateHandler {
 	 * Renders the index.html Pebble template and writes the output to the configured output directory
 	 */
 	public void render() {
-		System.out.println();
-		System.out.println("Template");
+		Logger.title("Template");
 		
 		try {
-			if (WurmMapGen.verbose) System.out.println("      Assembling template data");
+			Logger.details("Assembling template data");
 			
 			Map<String, Object> data = new HashMap<>();
 			data.put("serverName", WurmMapGen.properties.serverName);
@@ -38,7 +37,7 @@ public class TemplateHandler {
 			data.put("showGuardTowers", WurmMapGen.properties.showGuardTowers);
 			data.put("showStructures", WurmMapGen.properties.showStructures);
 			
-			if (WurmMapGen.verbose) System.out.println("      Compiling index.html");
+			Logger.details("Compiling index.html");
 			
 			FileReader template = new FileReader(templateDirectory + File.separator + "index.html");
 			FileWriter output = new FileWriter(WurmMapGen.properties.saveLocation.getAbsolutePath() + File.separator + "index.html", false);
@@ -49,19 +48,18 @@ public class TemplateHandler {
 			output.close();
 			
 		} catch (Exception e) {
-			System.out.println("ERROR " + e.getMessage());
+			Logger.error(e.getMessage());
 			e.printStackTrace();
 		}
 		
-		System.out.println("   OK Rendered index.html");
+		Logger.ok("Rendered index.html");
 	}
 	
 	/**
 	 * Copies the stylesheets, javascript files and images from the template directory into the output directory.
 	 */
 	public void copyAssets() throws IOException {
-		System.out.println();
-		System.out.println("Template assets");
+		Logger.title("Template assets");
 		
 		copyAssetsDirectory("app");
 		copyAssetsDirectory("css");
@@ -70,7 +68,7 @@ public class TemplateHandler {
 		copyAssetsDirectory("includes");
 		copyAssetsDirectory("markers");
 		
-		System.out.println("   OK Template asset files copied");
+		Logger.ok("Template asset files copied");
 	}
 	
 	/**
@@ -78,7 +76,7 @@ public class TemplateHandler {
 	 * @param directory the directory within ./template to copy
 	 */
 	private void copyAssetsDirectory(String directory) throws IOException {
-		if (WurmMapGen.verbose) System.out.println("      Copying directory " + directory);
+		Logger.details("Copying directory " + directory);
 		
 		FileUtils.copyDirectory(
 				new File(templateDirectory + File.separator + directory),

@@ -1,6 +1,6 @@
 package be.woubuc.wurmunlimited.wurmmapgen;
 
-import be.woubuc.wurmunlimited.wurmmapgen.filegen.FileGen;
+import be.woubuc.wurmunlimited.wurmmapgen.filegen.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,26 +12,32 @@ public class WurmMapGen {
 	public final static DatabaseHandler db = new DatabaseHandler();
 	public final static TileMapGenerator tileMapGenerator = new TileMapGenerator();
 	
-	private final static FileGen fileGenerator = new FileGen();
-	
 	public static boolean debug = false;
 	public static boolean verbose = false;
 	
 	public static void main(String[] args) throws Exception {
+		// Log intro
 		System.out.println("WurmMapGen");
 		System.out.println("      Developed and maintained by woubuc");
 		System.out.println("      Based on original code by garrett94");
 		System.out.println("      More info: github.com/woubuc/WurmMapGen");
 		
+		// Get command line arguments
 		Path propertiesFilePath = Paths.get("./WurmMapGen.properties").normalize();
 		Path templateDirectoryPath = Paths.get("./template").normalize();
-		
-		boolean templateOnly = false;
-		boolean showHelp = false;
 		
 		if (args.length > 0) {
 			for (int i = 0; i < args.length; i++) {
 				switch (args[i]) {
+					case "-h":
+					case "--help":
+						System.out.println();
+						System.out.println("Documentation");
+						System.out.println("      How to use: https://github.com/woubuc/WurmMapGen/wiki");
+						System.out.println("      Configuration: https://github.com/woubuc/WurmMapGen/wiki/Configuration");
+						System.exit(0);
+						break;
+						
 					case "-c":
 					case "--config":
 						propertiesFilePath = Paths.get(args[++i]);
@@ -41,24 +47,14 @@ public class WurmMapGen {
 					case "--template":
 						templateDirectoryPath = Paths.get(args[++i]);
 						break;
-					
-					case "-h":
-					case "--help":
-						showHelp = true;
-						break;
 						
 					case "-d":
 					case "--debug":
 						debug = true;
-						break;
 						
 					case "-v":
 					case "--verbose":
 						verbose = true;
-						break;
-						
-					case "--template-only":
-						templateOnly = true;
 						break;
 						
 					default:
@@ -69,19 +65,11 @@ public class WurmMapGen {
 		}
 		
 		System.out.println();
-		System.out.println("Using properties file: " + propertiesFilePath.toAbsolutePath());
-		System.out.println("      To use a different file: -c yourfile.properties");
-		
-		if (templateOnly) {
-			System.out.println();
-			System.out.println("Skipping map tile generation, only updating template");
-			System.out.println("      This is a dev feature and should generally not be used");
-		}
-		
-		// Allow for users to try something like -h or -help and just get the above info without running the mapgen
-		if (showHelp) {
-			return;
-		}
+		System.out.println("      Properties file: " + propertiesFilePath.toAbsolutePath());
+		System.out.println("      Template directory: " + templateDirectoryPath.toAbsolutePath());
+		if (verbose) System.out.println("      Verbose logging enabled");
+		if (debug) System.out.println("      Debug mode enabled");
+		if (!verbose) System.out.println();
 		
 		// Time the duration of the map generation
 		final long startTime = System.currentTimeMillis();
@@ -90,26 +78,40 @@ public class WurmMapGen {
 		if (!properties.load(propertiesFilePath)) return;
 		
 		fileManager.load();
-		if (!templateOnly) tileMapGenerator.openMap();
+		tileMapGenerator.openMap();
 		
 		if (!db.openDatabaseConnections()) return;
 		
-		if (!templateOnly) tileMapGenerator.generateMapTiles();
+		tileMapGenerator.generateMapTiles();
 		
 		TemplateHandler templateHandler = new TemplateHandler(templateDirectoryPath);
 		templateHandler.copyAssets();
 		templateHandler.render();
 		
-		fileGenerator.generateDataFiles();
+		final VillageFileGen villageFileGen = new VillageFileGen();
+		final StructureFileGen structureFileGen = new StructureFileGen();
+		final GuardTowerFileGen guardTowerFileGen = new GuardTowerFileGen();
+		ConfigFileGen.generateConfigFile();
+		ConfigFileGen.generatePhpConfigFile();
+		
+		if (WurmMapGen.properties.showDeeds) {
+			villageFileGen.generateVillageFile();
+		}
+		
+		if (WurmMapGen.properties.showStructures) {
+			structureFileGen.generateStructureFile(Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "structures.json").toString());
+		}
+		
+		if (WurmMapGen.properties.showGuardTowers) {
+			guardTowerFileGen.generateGuardTowerFile(Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "guardtowers.json").toString());
+		}
 		
 		if (!db.closeDatabaseConnections()) return;
 		
-		if (!templateOnly) tileMapGenerator.closeMap();
+		tileMapGenerator.closeMap();
 		fileManager.unload();
 		
-		
-		System.out.println();
-		System.out.println("Map generated");
-		System.out.println("      Duration: " + (System.currentTimeMillis() - startTime) + " ms");
+		Logger.info("");
+		Logger.info("Map generated in " + (System.currentTimeMillis() - startTime) + " ms", false);
 	}
 }

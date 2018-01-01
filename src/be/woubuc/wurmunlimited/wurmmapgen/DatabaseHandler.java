@@ -23,8 +23,7 @@ public class DatabaseHandler {
 	 * Opens all required database connections
 	 */
 	public boolean openDatabaseConnections() {
-		System.out.println();
-		System.out.println("Open db connections");
+		Logger.title("Open db connections");
 		
 		// Create connections
 		zones = new WurmDatabaseConnection(WurmMapGen.fileManager.db_wurmZones);
@@ -42,10 +41,11 @@ public class DatabaseHandler {
 			players.connect();
 			if (modSupport != null) modSupport.connect();
 		} catch (Exception e) {
-			System.err.println("ERROR Could not connect: " + e.getMessage());
+			Logger.error("Could not connect: " + e.getMessage());
 			return false;
 		}
 		
+		Logger.ok("Database connections opened");
 		return true;
 	}
 	
@@ -53,8 +53,7 @@ public class DatabaseHandler {
 	 * Closes the open database connections
 	 */
 	public boolean closeDatabaseConnections() {
-		System.out.println();
-		System.out.println("Close db connections");
+		Logger.title("Close db connections");
 		
 		try {
 			zones.disconnect();
@@ -62,10 +61,11 @@ public class DatabaseHandler {
 			players.disconnect();
 			if (modSupport != null) modSupport.disconnect();
 		} catch (Exception e) {
-			System.err.println("ERROR Could not close connection: " + e.getMessage());
+			Logger.error("Could not close connection: " + e.getMessage());
 			return false;
 		}
 		
+		Logger.ok("Database connections closed");
 		return true;
 	}
 	
@@ -112,10 +112,10 @@ public class DatabaseHandler {
 		 * Connects to the database
 		 */
 		private void connect() throws IOException, SQLException {
-			if (WurmMapGen.verbose) System.out.println("      Connecting to " + file.getName());
+			Logger.details("Connecting to " + file.getName());
 			
 			if (isConnected()) {
-				System.out.println(" WARN Already connected to " + file.getName());
+				Logger.warn("Already connected to " + file.getName());
 				return;
 			}
 			
@@ -124,22 +124,23 @@ public class DatabaseHandler {
 			}
 			
 			connection = DriverManager.getConnection("jdbc:sqlite:" + file);
-			if (WurmMapGen.verbose) System.out.println("   OK Connection established");
+			Logger.ok("Connection established", true);
 		}
 		
 		/**
 		 * Disconnects from the database
 		 */
 		private void disconnect() throws SQLException {
-			if (WurmMapGen.verbose) System.out.println("      Disconnecting from " + file.getName());
+			Logger.details("Disconnecting from " + file.getName());
 			
 			if (!isConnected()) {
-				System.out.println(" WARN Connection was not open");
+				Logger.warn("Connection was not open");
 				return;
 			}
 			
 			connection.close();
 			connection = null;
+			Logger.ok("Connection closed", true);
 		}
 	}
 }

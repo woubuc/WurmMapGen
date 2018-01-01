@@ -39,16 +39,15 @@ public class PropertiesManager {
 	 * @return true if the properties were loaded successfully
 	 */
 	public boolean load(Path propertiesFilePath) {
-		System.out.println();
-		System.out.println("Properties");
+		Logger.title("Properties");
 		
 		// Load properties file
 		Properties properties = new Properties();
 		try (InputStream input = new FileInputStream(propertiesFilePath.toAbsolutePath().toString())) {
-			System.out.println("      Loading properties file");
+			Logger.details("Loading properties file");
 			properties.load(input);
 		} catch (Exception e) {
-			System.err.println("ERROR Could not openDatabaseConnections properties: " + e.getMessage());
+			Logger.error("Could not openDatabaseConnections properties: " + e.getMessage());
 			return false;
 		}
 		
@@ -57,12 +56,12 @@ public class PropertiesManager {
 		
 		// Verify that the default settings have been changed
 		if (mapLocation.equals("C:/location/to/map/folder") || saveLocation.equals("C:/location/to/save/folder")) {
-			System.err.println("ERROR You are using default map or save location, please edit your properties file");
+			Logger.error("You are using default map or save location, please edit your properties file");
 			return false;
 		}
 		
-		System.out.println("      Map path: " + mapLocation);
-		System.out.println("      Save path: " + saveLocation);
+		Logger.details("Map path: " + mapLocation);
+		Logger.details("Save path: " + saveLocation);
 		
 		this.serverName = properties.getProperty("serverName");
 		
@@ -93,12 +92,11 @@ public class PropertiesManager {
 		this.saveLocation = new File(saveLocation);
 		
 		if (this.markerType < 1 || this.markerType > 3) {
-			System.out.println("ERROR Marker type should be a number between 1 - 3");
+			Logger.error("Marker type should be a number between 1 - 3");
 			return false;
 		}
 		
-		System.out.println("      Verbose logging " + (WurmMapGen.verbose ? "enabled" : "disabled"));
-		System.out.println("   OK Loaded properties");
+		Logger.ok("Loaded properties");
 		return true;
 	}
 }

@@ -47,39 +47,36 @@ public class TileMapGenerator {
 	 * Opens the MeshIO connection required for the map builder
 	 */
 	public void openMap() throws IOException {
-		System.out.println();
-		System.out.println("Open Wurm MeshIO connection");
+		Logger.title("Open Wurm MeshIO connection");
 		map = MeshIO.open(WurmMapGen.fileManager.map_topLayer.getAbsolutePath());
-		if (WurmMapGen.verbose) System.out.println("   OK Connection opened");
+		Logger.ok("Connection opened");
 	}
 	
 	/**
 	 * Closes the MeshIO connection
 	 */
 	public void closeMap() throws IOException {
-		System.out.println();
-		if (WurmMapGen.verbose) System.out.println("Close Wurm MeshIO connection");
+		Logger.title("Close Wurm MeshIO connection");
 		map.close();
-		if (WurmMapGen.verbose) System.out.println("   OK Connection closed");
+		Logger.ok("Connection closed");
 	}
 	
 	/**
 	 * Generates the map tile images
 	 */
 	public void generateMapTiles() {
-		System.out.println();
-		System.out.println("Map generation");
+		Logger.title("Map generation");
 		final long startTime = System.currentTimeMillis();
 		
 		Path imagesDirectory = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "images");
-		System.out.println("      Creating images directory " + imagesDirectory.toString());
+		Logger.details("Creating images directory " + imagesDirectory.toString());
 		try {
 			Files.createDirectories(imagesDirectory);
 		} catch (IOException e) {
-			System.err.println("ERROR Could not create directory");
+			Logger.error("Could not create directory");
 			return;
 		}
-		if (WurmMapGen.verbose) System.out.println("   OK Directory created");
+		Logger.ok("Directory created");
 		
 		final int tileCount = (map.getSize() / WurmMapGen.properties.mapTileSize);
 		final int totalProcesses = (tileCount * tileCount);
@@ -87,8 +84,8 @@ public class TileMapGenerator {
 		// Use executor to generate each tile in a separate thread
 		executor = Executors.newFixedThreadPool(WurmMapGen.properties.mapGeneratorThreads);
 		
-		if (WurmMapGen.verbose) System.out.println("      Server map size: " + map.getSize() + " x " + map.getSize());
-		if (WurmMapGen.verbose) System.out.println("      Interactive map tile size: " + WurmMapGen.properties.mapTileSize + " x " + WurmMapGen.properties.mapTileSize);
+		Logger.details("Server map size: " + map.getSize() + " x " + map.getSize());
+		Logger.details("Interactive map tile size: " + WurmMapGen.properties.mapTileSize + " x " + WurmMapGen.properties.mapTileSize);
 		
 		for (int x = 0; x < tileCount; x++) {
 			for (int y = 0; y < tileCount; y++) {
@@ -101,7 +98,7 @@ public class TileMapGenerator {
 					try {
 						generateImageTile(tileX, tileY);
 					} catch (Exception e) {
-						System.err.println("ERROR Could not generate mape tile image\n      " + e.getMessage());
+						Logger.error("Could not generate mape tile image\n      " + e.getMessage());
 						e.printStackTrace();
 						System.exit(1);
 					}
@@ -116,8 +113,7 @@ public class TileMapGenerator {
 			// Display progress
 			int percent = (int)((float)(totalProcesses - runningThreadsCount) / (float)(totalProcesses) * 100.0f);
 			
-			
-			System.out.print("      -> Generating map tiles " + percent + "%\r");
+			System.out.print((WurmMapGen.verbose ? "      -> " : "") + "Generating map tiles " + percent + "%\r");
 			
 			try {
 				synchronized (obj) {
@@ -126,7 +122,7 @@ public class TileMapGenerator {
 			} catch (InterruptedException ex) { }
 		}
 		
-		System.out.println("   OK Map tiles generated in " + (System.currentTimeMillis() - startTime) + "ms");
+		Logger.ok("Map tiles generated in " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
 	/**

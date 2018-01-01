@@ -1,5 +1,6 @@
 package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 
+import be.woubuc.wurmunlimited.wurmmapgen.Logger;
 import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -18,14 +19,13 @@ public class StructureFileGen {
 	 */
 	@SuppressWarnings("unchecked")
 	public void generateStructureFile(String filePath) throws IOException, SQLException {
-		System.out.println();
-		System.out.println("Structure data");
+		Logger.title("Structure data");
 		
 		// Prepare JSON container object
 		JSONObject dataObject = new JSONObject();
 		JSONArray data = new JSONArray();
 		
-		if (WurmMapGen.verbose) System.out.println("      Loading structures from wurmzones.db");
+		Logger.details("Loading structures from wurmzones.db");
 		Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT WURMID FROM STRUCTURES WHERE FINISHED='1';");
 		
@@ -63,19 +63,19 @@ public class StructureFileGen {
 		statement.close();
 		
 		if (count == 0) {
-			System.out.println(" SKIP No structures found");
+			Logger.custom("SKIP", "No structures found");
 			return;
 		}
 		
 		dataObject.put("structures", data);
 		
 		// Write JSON data to file
-		if (WurmMapGen.verbose) System.out.println("      Writing data/structures.json");
+		Logger.details("Writing data/structures.json");
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();
 		
-		System.out.println("   OK Added " + count + " entries to structures.json");
+		Logger.ok("Added " + count + " entries to structures.json");
 	}
 	
 	/**
@@ -127,7 +127,7 @@ public class StructureFileGen {
 				}
 				
 			} catch(SQLException e) {
-				System.out.println("ERROR " + e.getMessage());
+				Logger.error(e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -143,7 +143,7 @@ public class StructureFileGen {
 					this.ownerName = resultSet.getString("NAME");
 				}
 			} catch(SQLException e) {
-				System.out.println("ERROR " + e.getMessage());
+				Logger.error(e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -183,7 +183,7 @@ public class StructureFileGen {
 				}
 				
 			} catch (SQLException e) {
-				System.out.println("[ERROR] " + e.getMessage());
+				Logger.error(e.getMessage());
 				e.printStackTrace();
 			}
 		}
