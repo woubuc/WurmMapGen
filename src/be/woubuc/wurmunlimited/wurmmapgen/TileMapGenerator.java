@@ -50,7 +50,7 @@ public class TileMapGenerator {
 		System.out.println();
 		System.out.println("Open Wurm MeshIO connection");
 		map = MeshIO.open(WurmMapGen.fileManager.map_topLayer.getAbsolutePath());
-		if (WurmMapGen.properties.verbose) System.out.println("   OK Connection opened");
+		if (WurmMapGen.verbose) System.out.println("   OK Connection opened");
 	}
 	
 	/**
@@ -58,9 +58,9 @@ public class TileMapGenerator {
 	 */
 	public void closeMap() throws IOException {
 		System.out.println();
-		if (WurmMapGen.properties.verbose) System.out.println("Close Wurm MeshIO connection");
+		if (WurmMapGen.verbose) System.out.println("Close Wurm MeshIO connection");
 		map.close();
-		if (WurmMapGen.properties.verbose) System.out.println("   OK Connection closed");
+		if (WurmMapGen.verbose) System.out.println("   OK Connection closed");
 	}
 	
 	/**
@@ -79,7 +79,7 @@ public class TileMapGenerator {
 			System.err.println("ERROR Could not create directory");
 			return;
 		}
-		if (WurmMapGen.properties.verbose) System.out.println("   OK Directory created");
+		if (WurmMapGen.verbose) System.out.println("   OK Directory created");
 		
 		final int tileCount = (map.getSize() / WurmMapGen.properties.mapTileSize);
 		final int totalProcesses = (tileCount * tileCount);
@@ -87,8 +87,8 @@ public class TileMapGenerator {
 		// Use executor to generate each tile in a separate thread
 		executor = Executors.newFixedThreadPool(WurmMapGen.properties.mapGeneratorThreads);
 		
-		if (WurmMapGen.properties.verbose) System.out.println("      Server map size: " + map.getSize() + " x " + map.getSize());
-		if (WurmMapGen.properties.verbose) System.out.println("      Interactive map tile size: " + WurmMapGen.properties.mapTileSize + " x " + WurmMapGen.properties.mapTileSize);
+		if (WurmMapGen.verbose) System.out.println("      Server map size: " + map.getSize() + " x " + map.getSize());
+		if (WurmMapGen.verbose) System.out.println("      Interactive map tile size: " + WurmMapGen.properties.mapTileSize + " x " + WurmMapGen.properties.mapTileSize);
 		
 		for (int x = 0; x < tileCount; x++) {
 			for (int y = 0; y < tileCount; y++) {

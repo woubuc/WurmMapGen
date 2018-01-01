@@ -28,11 +28,11 @@ public class GuardTowerFileGen {
 		
 		List<Integer> towerIds = new ArrayList(Arrays.asList(384, 430, 528, 638, 996));
 		if (WurmMapGen.db.getModSupport() != null) {
-			if (WurmMapGen.properties.verbose) System.out.println("      Loading modded guard tower IDs");
+			if (WurmMapGen.verbose) System.out.println("      Loading modded guard tower IDs");
 			towerIds.addAll(loadModdedTowerIds());
 		}
 		
-		if (WurmMapGen.properties.verbose) System.out.println("      Loading guard towers from wurmitems.db");
+		if (WurmMapGen.verbose) System.out.println("      Loading guard towers from wurmitems.db");
 		
 		StringBuilder query = new StringBuilder();
 		query.append("select LASTOWNERID, POSX, POSY, QUALITYLEVEL, DAMAGE from ITEMS where (");
@@ -97,7 +97,7 @@ public class GuardTowerFileGen {
 		dataObject.put("guardtowers", data);
 		
 		// Write JSON data to file
-		if (WurmMapGen.properties.verbose) System.out.println("      Creating data/guardtowers.json");
+		if (WurmMapGen.verbose) System.out.println("      Creating data/guardtowers.json");
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());
 		writer.close();

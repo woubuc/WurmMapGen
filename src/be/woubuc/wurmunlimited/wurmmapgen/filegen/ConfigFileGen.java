@@ -58,7 +58,7 @@ public class ConfigFileGen {
 		
 		configObject.put("config", config);
 		
-		if (WurmMapGen.properties.verbose) System.out.println("      Creating data/config.json");
+		if (WurmMapGen.verbose) System.out.println("      Creating data/config.json");
 		String filePath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "config.json").toString();
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(configObject.toJSONString());
@@ -74,7 +74,7 @@ public class ConfigFileGen {
 		System.out.println();
 		System.out.println("PHP config data");
 		
-		if (WurmMapGen.properties.verbose) System.out.println("      Creating includes/config.php");
+		if (WurmMapGen.verbose) System.out.println("      Creating includes/config.php");
 		String filePath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "includes", "config.php").toString();
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(String.format("<?php\n$conf_rmi_host = '%s';\n$conf_rmi_port = '%s';\n?>",

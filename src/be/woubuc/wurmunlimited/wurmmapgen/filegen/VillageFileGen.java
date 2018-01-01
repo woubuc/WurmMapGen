@@ -23,7 +23,7 @@ public class VillageFileGen {
 		System.out.println("Deeds data");
 		
 		// Load list of villages
-		if (WurmMapGen.properties.verbose) System.out.println("      Loading villages from wurmzones.db");
+		if (WurmMapGen.verbose) System.out.println("      Loading villages from wurmzones.db");
 		Statement statement = WurmMapGen.db.getZones().getConnection().createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT ID FROM VILLAGES WHERE DISBANDED=0;");
 		
@@ -75,7 +75,7 @@ public class VillageFileGen {
 		dataObject.put("villages", data);
 		
 		// Write JSON data to file
-		if (WurmMapGen.properties.verbose) System.out.println("      Creating data/villages.json");
+		if (WurmMapGen.verbose) System.out.println("      Creating data/villages.json");
 		String filePath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "villages.json").toString();
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(dataObject.toJSONString());

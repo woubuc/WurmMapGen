@@ -7,12 +7,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TemplateHandler {
 
-	private final String templateDirectory = "./template";
+	private final String templateDirectory;
+	
+	public TemplateHandler(Path templateDirectory) {
+		this.templateDirectory = templateDirectory.normalize().toString();
+	}
 	
 	/**
 	 * Renders the index.html Pebble template and writes the output to the configured output directory
@@ -22,7 +27,7 @@ public class TemplateHandler {
 		System.out.println("Template");
 		
 		try {
-			if (WurmMapGen.properties.verbose) System.out.println("      Assembling template data");
+			if (WurmMapGen.verbose) System.out.println("      Assembling template data");
 			
 			Map<String, Object> data = new HashMap<>();
 			data.put("serverName", WurmMapGen.properties.serverName);
@@ -33,7 +38,7 @@ public class TemplateHandler {
 			data.put("showGuardTowers", WurmMapGen.properties.showGuardTowers);
 			data.put("showStructures", WurmMapGen.properties.showStructures);
 			
-			if (WurmMapGen.properties.verbose) System.out.println("      Compiling index.html");
+			if (WurmMapGen.verbose) System.out.println("      Compiling index.html");
 			
 			FileReader template = new FileReader(templateDirectory + File.separator + "index.html");
 			FileWriter output = new FileWriter(WurmMapGen.properties.saveLocation.getAbsolutePath() + File.separator + "index.html", false);
@@ -73,7 +78,7 @@ public class TemplateHandler {
 	 * @param directory the directory within ./template to copy
 	 */
 	private void copyAssetsDirectory(String directory) throws IOException {
-		if (WurmMapGen.properties.verbose) System.out.println("      Copying directory " + directory);
+		if (WurmMapGen.verbose) System.out.println("      Copying directory " + directory);
 		
 		FileUtils.copyDirectory(
 				new File(templateDirectory + File.separator + directory),

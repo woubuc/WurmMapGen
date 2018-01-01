@@ -21,8 +21,6 @@ public class PropertiesManager {
 	public Boolean showGuardTowers = true;
 	public Boolean showStructures = true;
 	
-	public Boolean verbose = false;
-	
 	public int mapGeneratorThreads = 2;
 	public int mapTileSize = 256;
 	
@@ -79,7 +77,7 @@ public class PropertiesManager {
 		this.showGuardTowers = Boolean.parseBoolean(properties.getProperty("showGuardTowers", Boolean.toString(this.showGuardTowers)));
 		this.showStructures = Boolean.parseBoolean(properties.getProperty("showStructures", Boolean.toString(this.showStructures)));
 		
-		this.verbose = Boolean.parseBoolean(properties.getProperty("verbose", Boolean.toString(this.verbose)));
+		WurmMapGen.verbose = Boolean.parseBoolean(properties.getProperty("verbose", Boolean.toString(WurmMapGen.verbose)));
 		
 		this.mapGeneratorThreads = Integer.parseInt(properties.getProperty("mapGeneratorThreads", Integer.toString(this.mapGeneratorThreads)));
 		this.mapTileSize = Integer.parseInt(properties.getProperty("mapTileSize", Integer.toString(this.mapTileSize)));
@@ -99,7 +97,7 @@ public class PropertiesManager {
 			return false;
 		}
 		
-		System.out.println("      Verbose logging " + (verbose ? "enabled" : "disabled"));
+		System.out.println("      Verbose logging " + (WurmMapGen.verbose ? "enabled" : "disabled"));
 		System.out.println("   OK Loaded properties");
 		return true;
 	}

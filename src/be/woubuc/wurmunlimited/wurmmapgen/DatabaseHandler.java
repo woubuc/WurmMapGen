@@ -112,7 +112,7 @@ public class DatabaseHandler {
 		 * Connects to the database
 		 */
 		private void connect() throws IOException, SQLException {
-			if (WurmMapGen.properties.verbose) System.out.println("      Connecting to " + file.getName());
+			if (WurmMapGen.verbose) System.out.println("      Connecting to " + file.getName());
 			
 			if (isConnected()) {
 				System.out.println(" WARN Already connected to " + file.getName());
@@ -124,14 +124,14 @@ public class DatabaseHandler {
 			}
 			
 			connection = DriverManager.getConnection("jdbc:sqlite:" + file);
-			if (WurmMapGen.properties.verbose) System.out.println("   OK Connection established");
+			if (WurmMapGen.verbose) System.out.println("   OK Connection established");
 		}
 		
 		/**
 		 * Disconnects from the database
 		 */
 		private void disconnect() throws SQLException {
-			if (WurmMapGen.properties.verbose) System.out.println("      Disconnecting from " + file.getName());
+			if (WurmMapGen.verbose) System.out.println("      Disconnecting from " + file.getName());
 			
 			if (!isConnected()) {
 				System.out.println(" WARN Connection was not open");

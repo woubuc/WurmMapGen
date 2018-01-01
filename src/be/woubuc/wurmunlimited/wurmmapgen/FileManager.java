@@ -38,9 +38,9 @@ public class FileManager {
 		final long startTime = System.currentTimeMillis();
 		
 		Files.createDirectories(tempDir);
-		if (WurmMapGen.properties.verbose) { System.out.println("      Created directory " + tempDir.toString()); }
+		if (WurmMapGen.verbose) { System.out.println("      Created directory " + tempDir.toString()); }
 		
-		if (WurmMapGen.properties.verbose) { System.out.println("      Loading required files"); }
+		if (WurmMapGen.verbose) { System.out.println("      Loading required files"); }
 		map_topLayer = new WurmFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "top_layer.map"));
 		
 		db_wurmZones = new DatabaseFile(Paths.get(WurmMapGen.properties.wurmMapLocation.getAbsolutePath(), "sqlite", "wurmzones.db"));
@@ -52,7 +52,7 @@ public class FileManager {
 			db_modSupport = new DatabaseFile(modSupportPath);
 		}
 		
-		if (WurmMapGen.properties.verbose) { System.out.println("      Copying files to temp directory"); }
+		if (WurmMapGen.verbose) { System.out.println("      Copying files to temp directory"); }
 		map_topLayer = map_topLayer.copyToDirectory(tempDir);
 		db_wurmZones = db_wurmZones.copyToDirectory(tempDir);
 		db_wurmItems = db_wurmItems.copyToDirectory(tempDir);
@@ -94,20 +94,20 @@ public class FileManager {
 		 * @param  destination  The destination directory
 		 */
 		DatabaseFile copyToDirectory(Path destination) throws IOException {
-			if (WurmMapGen.properties.verbose) { System.out.println("      -> " + this.getName()); }
+			if (WurmMapGen.verbose) { System.out.println("      -> " + this.getName()); }
 			
 			DatabaseFile dest = new DatabaseFile(Paths.get(destination.toString(), this.getName()));
 			FileUtils.copyFile((File) this, dest);
 			
 			File wal = new File(this.getAbsolutePath() + "-wal");
 			if (wal.exists()) {
-				if (WurmMapGen.properties.verbose) { System.out.println("      -> " + wal.getName()); }
+				if (WurmMapGen.verbose) { System.out.println("      -> " + wal.getName()); }
 				FileUtils.copyFileToDirectory(wal, destination.toFile());
 			}
 			
 			File shm = new File(this.getAbsolutePath() + "-shm");
 			if (shm.exists()) {
-				if (WurmMapGen.properties.verbose) { System.out.println("      -> " + shm.getName()); }
+				if (WurmMapGen.verbose) { System.out.println("      -> " + shm.getName()); }
 				FileUtils.copyFileToDirectory(shm, destination.toFile());
 			}
 			
@@ -133,7 +133,7 @@ public class FileManager {
 		 * @param  destination  The destination directory
 		 */
 		WurmFile copyToDirectory(Path destination) throws IOException {
-			if (WurmMapGen.properties.verbose) { System.out.println("      -> " + this.getName()); }
+			if (WurmMapGen.verbose) { System.out.println("      -> " + this.getName()); }
 			
 			WurmFile dest = new WurmFile(Paths.get(destination.toString(), this.getName()));
 			FileUtils.copyFile((File) this, dest);
