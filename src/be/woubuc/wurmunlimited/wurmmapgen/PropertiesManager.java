@@ -20,6 +20,7 @@ public class PropertiesManager {
 	public Boolean showDeeds = true;
 	public Boolean showGuardTowers = true;
 	public Boolean showStructures = true;
+	public boolean showPortals = true;
 	
 	public int mapGeneratorThreads = 2;
 	public int mapTileSize = 256;
@@ -75,6 +76,7 @@ public class PropertiesManager {
 		this.showDeeds = Boolean.parseBoolean(properties.getProperty("showDeeds", Boolean.toString(this.showDeeds)));
 		this.showGuardTowers = Boolean.parseBoolean(properties.getProperty("showGuardTowers", Boolean.toString(this.showGuardTowers)));
 		this.showStructures = Boolean.parseBoolean(properties.getProperty("showStructures", Boolean.toString(this.showStructures)));
+		this.showPortals = Boolean.parseBoolean(properties.getProperty("showPortals", Boolean.toString(this.showPortals)));
 		
 		WurmMapGen.verbose = Boolean.parseBoolean(properties.getProperty("verbose", Boolean.toString(WurmMapGen.verbose)));
 		

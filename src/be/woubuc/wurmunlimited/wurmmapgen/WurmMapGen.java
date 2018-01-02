@@ -136,7 +136,9 @@ public class WurmMapGen {
 		}
 		
 		// data/portals.json
-		PortalFileGen portalFileGen = new PortalFileGen();
-		portalFileGen.generateFile();
+		if (WurmMapGen.properties.showPortals) {
+			PortalFileGen portalFileGen = new PortalFileGen();
+			portalFileGen.generateFile();
+		}
 	}
 }
