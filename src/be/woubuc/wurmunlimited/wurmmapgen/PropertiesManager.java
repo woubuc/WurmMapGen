@@ -98,7 +98,7 @@ public class PropertiesManager {
 			return false;
 		}
 		
-		Logger.ok("Loaded properties");
+		Logger.ok("Loaded properties file");
 		return true;
 	}
 }

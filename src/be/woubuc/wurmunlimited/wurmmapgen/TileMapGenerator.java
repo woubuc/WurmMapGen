@@ -49,7 +49,7 @@ public class TileMapGenerator {
 	public void openMap() throws IOException {
 		Logger.title("Open Wurm MeshIO connection");
 		map = MeshIO.open(WurmMapGen.fileManager.map_topLayer.getAbsolutePath());
-		Logger.ok("Connection opened");
+		Logger.ok("MeshIO connection opened");
 	}
 	
 	/**
@@ -76,7 +76,7 @@ public class TileMapGenerator {
 			Logger.error("Could not create directory");
 			return;
 		}
-		Logger.ok("Directory created");
+		Logger.ok("Images directory created");
 		
 		final int tileCount = (map.getSize() / WurmMapGen.properties.mapTileSize);
 		final int totalProcesses = (tileCount * tileCount);
