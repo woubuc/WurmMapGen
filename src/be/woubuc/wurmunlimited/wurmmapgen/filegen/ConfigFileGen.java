@@ -4,11 +4,13 @@ import be.woubuc.wurmunlimited.wurmmapgen.Logger;
 import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
 import org.json.simple.JSONObject;
 
+import java.nio.file.Paths;
+
 public final class ConfigFileGen extends FileGen {
 	
 	// Set config.json filename
 	public ConfigFileGen() {
-		setFileName("config.json");
+		setFilePath(Paths.get(WurmMapGen.dataPath, "config.json"));
 	}
 	
 	/**

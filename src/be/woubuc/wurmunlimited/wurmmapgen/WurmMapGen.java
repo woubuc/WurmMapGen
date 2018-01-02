@@ -1,9 +1,12 @@
 package be.woubuc.wurmunlimited.wurmmapgen;
 
+import be.woubuc.wurmunlimited.wurmmapgen.database.DatabaseHandler;
 import be.woubuc.wurmunlimited.wurmmapgen.filegen.*;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 
 public class WurmMapGen {
 	
@@ -14,6 +17,9 @@ public class WurmMapGen {
 	
 	public static boolean debug = false;
 	public static boolean verbose = false;
+	
+	public static String dataPath;
+	public static String phpPath;
 	
 	public static void main(String[] args) throws Exception {
 		// Log intro
@@ -74,8 +80,10 @@ public class WurmMapGen {
 		// Time the duration of the map generation
 		final long startTime = System.currentTimeMillis();
 		
-		
+		// Load and assign properties
 		if (!properties.load(propertiesFilePath)) return;
+		dataPath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data").toString();
+		phpPath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "includes").toString();
 		
 		fileManager.load();
 		tileMapGenerator.openMap();
@@ -88,34 +96,8 @@ public class WurmMapGen {
 		templateHandler.copyAssets();
 		templateHandler.render();
 		
-		final VillageFileGen villageFileGen = new VillageFileGen();
-		final StructureFileGen structureFileGen = new StructureFileGen();
-		final GuardTowerFileGen guardTowerFileGen = new GuardTowerFileGen();
 		
-		String dataPath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data").toString();
-		String phpPath = Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "includes").toString();
-		
-		ConfigFileGen configFileGen = new ConfigFileGen();
-		configFileGen.generateFile(dataPath);
-		
-		PhpConfigFileGen phpConfigFileGen = new PhpConfigFileGen();
-		phpConfigFileGen.generateFile(phpPath);
-		
-		if (WurmMapGen.properties.showDeeds) {
-			villageFileGen.generateVillageFile();
-		}
-		
-		if (WurmMapGen.properties.showStructures) {
-			structureFileGen.generateStructureFile(Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "structures.json").toString());
-		}
-		
-		if (WurmMapGen.properties.showGuardTowers) {
-			guardTowerFileGen.generateGuardTowerFile(Paths.get(WurmMapGen.properties.saveLocation.getAbsolutePath(), "data", "guardtowers.json").toString());
-		}
-		
-		PortalFileGen portalFileGen = new PortalFileGen();
-		portalFileGen.generateFile(dataPath);
-		
+		generateDataFiles();
 		
 		if (!db.closeDatabaseConnections()) return;
 		
@@ -124,5 +106,37 @@ public class WurmMapGen {
 		
 		Logger.info("");
 		Logger.info("Map generated in " + (System.currentTimeMillis() - startTime) + " ms", false);
+	}
+	
+	private static void generateDataFiles() throws IOException, SQLException {
+		// data/config.json
+		final ConfigFileGen configFileGen = new ConfigFileGen();
+		configFileGen.generateFile();
+		
+		// includes/config.php
+		final PhpConfigFileGen phpConfigFileGen = new PhpConfigFileGen();
+		phpConfigFileGen.generateFile();
+		
+		// data/villages.json
+		if (WurmMapGen.properties.showDeeds) {
+			final VillageFileGen villageFileGen = new VillageFileGen();
+			villageFileGen.generateFile();
+		}
+		
+		// data/structures.json
+		if (WurmMapGen.properties.showStructures) {
+			final StructureFileGen structureFileGen = new StructureFileGen();
+			structureFileGen.generateFile();
+		}
+		
+		// data/guardtowers.json
+		if (WurmMapGen.properties.showGuardTowers) {
+			final GuardTowerFileGen guardTowerFileGen = new GuardTowerFileGen();
+			guardTowerFileGen.generateFile();
+		}
+		
+		// data/portals.json
+		PortalFileGen portalFileGen = new PortalFileGen();
+		portalFileGen.generateFile();
 	}
 }

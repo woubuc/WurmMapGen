@@ -5,28 +5,23 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 public abstract class FileGen {
 	
-	private String fileName;
-	void setFileName(String fileName) { this.fileName = fileName; }
+	private String filePath;
+	void setFilePath(Path filePath) { this.filePath = filePath.toString(); }
 	
 	/**
 	 * Generates the file
-	 * @param  basePath  The path where the datafile should be generated
 	 */
-	public void generateFile(String basePath) throws IOException {
-		String filePath = Paths.get(basePath, fileName).normalize().toAbsolutePath().toString();
+	public void generateFile() throws IOException {
+		// Generate data
 		String data = generateData();
-		
-		if (data == null) {
-			Logger.error("Could not generate data");
-			return;
-		}
+		if (data == null) return;
 		
 		// Write data to file
-		Logger.details("Creating " + filePath);
+		Logger.details("Writing " + filePath);
 		FileWriter writer = new FileWriter(filePath, false);
 		writer.write(data);
 		writer.close();

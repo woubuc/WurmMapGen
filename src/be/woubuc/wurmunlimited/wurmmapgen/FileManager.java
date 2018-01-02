@@ -68,7 +68,7 @@ public class FileManager {
 		Logger.title("Remove temp file copies");
 		
 		FileUtils.deleteDirectory(tempDir.toFile());
-		Logger.ok("Directory deleted");
+		Logger.ok("Temp directory deleted");
 	}
 	
 	/**

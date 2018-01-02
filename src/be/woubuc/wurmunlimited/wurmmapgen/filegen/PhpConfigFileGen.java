@@ -3,10 +3,12 @@ package be.woubuc.wurmunlimited.wurmmapgen.filegen;
 import be.woubuc.wurmunlimited.wurmmapgen.Logger;
 import be.woubuc.wurmunlimited.wurmmapgen.WurmMapGen;
 
+import java.nio.file.Paths;
+
 public final class PhpConfigFileGen extends FileGen {
 	
 	public PhpConfigFileGen() {
-		setFileName("config.php");
+		setFilePath(Paths.get(WurmMapGen.phpPath, "config.php"));
 	}
 	
 	@Override
