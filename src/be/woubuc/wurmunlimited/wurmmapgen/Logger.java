@@ -82,8 +82,8 @@ public class Logger {
 	 */
 	public static void custom(String label, String message, boolean isVerbose) {
 		StringBuilder messageBuilder = new StringBuilder();
-		if (label.length() < 6) {
-			for (int i = 0; i < 6 - label.length(); i++) {
+		if (label.length() < 5) {
+			for (int i = 0; i < 5 - label.length(); i++) {
 				messageBuilder.append(" ");
 			}
 		}
