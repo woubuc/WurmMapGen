@@ -1,3 +1,13 @@
+WurmMapGen v2.3.0
+-----------------
+Added:   Modded towers (kingdom items mod) will now be displayed on the map
+Added:   Vanilla and modded portals (new portals mod) will now be displayed on the map, if enabled in properties file
+Added:   Added CLI arguments -t/--template, -d/--debug and -v/--verbose
+Added:   Use a different template through CLI argument (ex. `WurmMapGen.jar -t ./my-custom-template`)
+Fixed:   Reduced excessive memory usage by forcing garbage collection after generating map tiles
+Changed: Verbose logging is now a CLI flag, verbose value in the properties file is deprecated
+Changed: Reworked database classes & queries to make the code more DRY
+
 WurmMapGen v2.2.0
 -----------------
 Added:   Select properties file using CLI argument "-c yourfile.properties"
