@@ -60,6 +60,14 @@
 		</div>
 		{{/showGuardTowers}}
 
+		{{#showPortals}}
+		<div class="block">
+			<label for="option-show-portals" class="flex">
+				<input type="checkbox" class="transition" id="option-show-portals" v-model="showPortals"> Show portals
+			</label>
+		</div>
+		{{/showPortals}}
+
 		{{#showStructures}}
 		<div class="block">
 			<label for="option-show-structures" class="flex">

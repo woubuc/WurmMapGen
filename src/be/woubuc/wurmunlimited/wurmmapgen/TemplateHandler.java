@@ -36,6 +36,7 @@ public class TemplateHandler {
 			data.put("showDeeds", WurmMapGen.properties.showDeeds);
 			data.put("showGuardTowers", WurmMapGen.properties.showGuardTowers);
 			data.put("showStructures", WurmMapGen.properties.showStructures);
+			data.put("showPortals", WurmMapGen.properties.showPortals);
 			
 			Logger.details("Compiling index.html");
 			
