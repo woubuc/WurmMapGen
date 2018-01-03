@@ -49,8 +49,8 @@ public final class GuardTowerFileGen extends FileGen {
 			towerBorders.add(guardTower.getMaxY());
 			towerData.put("borders", towerBorders);
 			
-			towerData.put("x", guardTower.getX());
-			towerData.put("y", guardTower.getY());
+			towerData.put("x", guardTower.getPosX());
+			towerData.put("y", guardTower.getPosY());
 			
 			towerData.put("creator", guardTower.getOwnerName());
 			towerData.put("ql", decimalFormat.format(guardTower.getQl()));

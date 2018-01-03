@@ -9,8 +9,8 @@ import java.sql.SQLException;
 
 public final class GuardTower {
 	
-	private final int x;
-	private final int y;
+	private final int posX;
+	private final int posY;
 	
 	private String ownerName;
 	private final long ownerID;
@@ -27,8 +27,8 @@ public final class GuardTower {
 	
 	public String getOwnerName() { return ownerName; }
 	
-	public int getX() { return x; }
-	public int getY() { return y; }
+	public int getPosX() { return posX; }
+	public int getPosY() { return posY; }
 	
 	public int getMinX() { return minX; }
 	public int getMaxX() { return maxX; }
@@ -41,24 +41,24 @@ public final class GuardTower {
 	/**
 	 * Initialises a guard tower
 	 * @param  ownerID  ID of the guard tower's owner
-	 * @param  x        The x coordinate of the tower
-	 * @param  y        The y coordinate of the tower
+	 * @param  posX     The X coordinate of the tower
+	 * @param  posY     The Y coordinate of the tower
 	 * @param  ql       The item quality level
 	 * @param  dmg      The total damage of the tower
 	 */
-	GuardTower(long ownerID, int x, int y, float ql, float dmg) {
+	GuardTower(long ownerID, int posX, int posY, float ql, float dmg) {
 		this.ownerID = ownerID;
 		
-		this.x = x;
-		this.y = y;
+		this.posX = (int) Math.floor(posX / 4);
+		this.posY = (int) Math.floor(posY / 4);
 		
 		this.ql = ql;
 		this.dmg = dmg;
 		
-		this.minX = x - areaLimit;
-		this.maxX = x + areaLimit;
-		this.minY = y - areaLimit;
-		this.maxY = y + areaLimit;
+		this.minX = this.posX - areaLimit;
+		this.maxX = this.posX + areaLimit;
+		this.minY = this.posY - areaLimit;
+		this.maxY = this.posY + areaLimit;
 		
 		loadOwnerData();
 	}
