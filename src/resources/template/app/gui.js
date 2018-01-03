@@ -18,6 +18,7 @@ WurmMapGen.gui = new Vue({
 
 		showStructures: true,
 		showPlayers: true,
+		showPortals: true,
 
 		showVillages: true,
 		showVillageBorders: true,
@@ -132,6 +133,25 @@ WurmMapGen.gui = new Vue({
 				}
 			}
 
+			if (this.showPortals) {
+				for (i = 0; i < WurmMapGen.portals.length; i++) {
+					var portal = WurmMapGen.portals[i];
+
+					var name = escapeHtml(portal.name);
+
+					if ((index = name.toLowerCase().indexOf(query)) > -1) {
+						results.push({
+							type: 'portal',
+							x: portal.x,
+							y: portal.y,
+							label: '<p>' + name + '</p><p class="small">Portal</p>'
+						});
+					}
+
+					if (results.length >= 8) return results;
+				}
+			}
+
 			// Find guard towers that match the search query
 			if (this.showTowers) {
 				for (i = 0; i < WurmMapGen.guardtowers.length; i++) {
@@ -171,6 +191,9 @@ WurmMapGen.gui = new Vue({
 
 		showStructures: function(value) {
         	this._setMapLayer('structureBorders', value);
+        },
+		showPortals: function(value) {
+        	this._setMapLayer('portalMarkers', value);
         },
 		showPlayers: function(value) {
         	this._setMapLayer('playerMarkers', value);
@@ -224,6 +247,7 @@ WurmMapGen.gui = new Vue({
 			}
 
 			this.showStructures = WurmMapGen.util.getConfig('structureBorders', true);
+			this.showPortals = WurmMapGen.util.getConfig('portalMarkers', true);
 
 			this.showVillages = WurmMapGen.util.getConfig('villageMarkers', true);
 			this.showVillageBorders = WurmMapGen.util.getConfig('villageBorders', true);

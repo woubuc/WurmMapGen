@@ -84,6 +84,7 @@ label { display:block; padding:10px 0; cursor:pointer; }
 #search-results div.guardtower { background-image:url('../markers/v2-search-guardtower.png'); }
 #search-results div.player { background-image:url('../markers/v2-search-player.png'); }
 #search-results div.structure { background-image:url('../markers/v2-search-structure.png'); }
+#search-results div.portal { background-image:url('../markers/v2-search-portal.png'); }
 
 #search-results div:hover { background-color:#eee; border-radius:3px; }
 #search-results div p strong { font-weight:700; }

@@ -25,6 +25,7 @@ WurmMapGen.markers = {
 		if (WurmMapGen.config.markerType === 1) {
 			if (itemType === 'guardtower') { return WurmMapGen.markers.style1.guardtower; }
 			if (itemType === 'player') { return WurmMapGen.markers.style1.player; }
+			if (itemType === 'portal') { return WurmMapGen.markers.style2.portal; }
 
 			if (item.permanent) { return WurmMapGen.markers.style1.main; }
 			return WurmMapGen.markers.style1['letter_' + item.name.charAt(0).toLowerCase()];
@@ -34,6 +35,7 @@ WurmMapGen.markers = {
 		if (WurmMapGen.config.markerType === 2) {
 			if (itemType === 'guardtower') { return WurmMapGen.markers.style2.guardtower; }
 			if (itemType === 'player') { return WurmMapGen.markers.style2.player; }
+			if (itemType === 'portal') { return WurmMapGen.markers.style2.portal; }
 
 			if (item.citizens < 2) { return WurmMapGen.markers.style2.village_solo; }
 			if (item.citizens < 9) { return WurmMapGen.markers.style2.village_small; }
@@ -94,6 +96,7 @@ WurmMapGen.markers = {
 		village_small: new markerIcon({iconUrl: 'markers/v2-village-small.png'}),
 		village_large: new markerIcon({iconUrl: 'markers/v2-village-large.png'}),
 
+		portal: new markerIcon({iconUrl: 'markers/v2-portal.png'}),
 		player: new markerIcon({iconUrl: 'markers/v2-player.png'}),
 		guardtower: new markerIcon({iconUrl: 'markers/v2-guardtower.png'})
 	},

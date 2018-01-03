@@ -8,6 +8,7 @@ WurmMapGen.config = null;
 WurmMapGen.villages = null;
 WurmMapGen.guardtowers = null;
 WurmMapGen.structures = null;
+WurmMapGen.portals = null;
 
 // Helper function to fetch a dataset from a JSON file
 function fetchData(key, path) {
@@ -47,7 +48,8 @@ var promises = [
 	fetchData('config', 'config.json'),
 	fetchData('villages', 'villages.json'),
 	fetchData('guardtowers', 'guardtowers.json'),
-	fetchData('structures', 'structures.json')
+	fetchData('structures', 'structures.json'),
+	fetchData('portals', 'portals.json')
 ];
 
 if (document.body.getAttribute('data-realtime') === 'true') {

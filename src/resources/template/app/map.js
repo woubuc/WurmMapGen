@@ -67,6 +67,7 @@ WurmMapGen.map = {
 		var guardtowerBorders = WurmMapGen.map.layers.guardtowerBorders = L.layerGroup();
 		var guardtowerMarkers = WurmMapGen.map.layers.guardtowerMarkers = L.layerGroup();
 		var structureBorders = WurmMapGen.map.layers.structureBorders = L.layerGroup();
+		var portalMarkers = WurmMapGen.map.layers.portalMarkers = L.layerGroup();
 		var playerMarkers = WurmMapGen.map.layers.playerMarkers = L.layerGroup();
 
 		// Add villages
@@ -166,6 +167,22 @@ WurmMapGen.map = {
 			structureBorders.addLayer(border);
 		}
 
+		// Add portals
+		for (var i = 0; i < WurmMapGen.portals.length; i++) {
+			var portal = WurmMapGen.portals[i];
+
+			var marker = L.marker(xy(portal.x, portal.y),
+				{icon: WurmMapGen.markers.getMarker('portal')}
+			);
+
+			marker.bindPopup([
+				'<div align="center"><b>' + escapeHtml(portal.name) + '</b>',
+				'<i>Portal</i></div>'
+				].join('<br>'));
+
+			portalMarkers.addLayer(marker);
+		}
+
 		// Add players
 		WurmMapGen.map.updatePlayerMarkers();
 
@@ -175,6 +192,7 @@ WurmMapGen.map = {
 		guardtowerBorders.addTo(map);
 		guardtowerMarkers.addTo(map);
 		structureBorders.addTo(map);
+		portalMarkers.addTo(map);
 		playerMarkers.addTo(map);
 	},
 
