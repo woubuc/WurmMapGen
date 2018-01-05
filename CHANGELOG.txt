@@ -1,3 +1,8 @@
+WurmMapGen v2.3.1
+-----------------
+Fixed:   Added missing empty portals.json datafile
+Fixed:   CLI flag --verbose now takes precedence over (deprecated) setting in properties file
+
 WurmMapGen v2.3.0
 -----------------
 Added:   Modded towers (kingdom items mod) will now be displayed on the map
