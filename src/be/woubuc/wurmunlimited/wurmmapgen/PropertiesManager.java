@@ -48,7 +48,7 @@ public class PropertiesManager {
 			Logger.details("Loading properties file");
 			properties.load(input);
 		} catch (Exception e) {
-			Logger.error("Could not openDatabaseConnections properties: " + e.getMessage());
+			Logger.error("Could not open properties: " + e.getMessage());
 			return false;
 		}
 		
