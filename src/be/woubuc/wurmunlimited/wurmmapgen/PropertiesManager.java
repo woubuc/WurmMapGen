@@ -78,7 +78,9 @@ public class PropertiesManager {
 		this.showStructures = Boolean.parseBoolean(properties.getProperty("showStructures", Boolean.toString(this.showStructures)));
 		this.showPortals = Boolean.parseBoolean(properties.getProperty("showPortals", Boolean.toString(this.showPortals)));
 		
-		WurmMapGen.verbose = Boolean.parseBoolean(properties.getProperty("verbose", Boolean.toString(WurmMapGen.verbose)));
+		if (!WurmMapGen.verbose) {
+			WurmMapGen.verbose = Boolean.parseBoolean(properties.getProperty("verbose", Boolean.toString(WurmMapGen.verbose)));
+		}
 		
 		this.mapGeneratorThreads = Integer.parseInt(properties.getProperty("mapGeneratorThreads", Integer.toString(this.mapGeneratorThreads)));
 		this.mapTileSize = Integer.parseInt(properties.getProperty("mapTileSize", Integer.toString(this.mapTileSize)));
