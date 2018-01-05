@@ -118,6 +118,7 @@ public class DatabaseHandler {
 			Logger.error("Could not load modded items: " + e.getMessage());
 		}
 		
+		Logger.ok("Loaded " + ids.size() + " IDs from modsupport.db", true);
 		return ids;
 	}
 	
