@@ -46,6 +46,7 @@ WurmMapGen.markers = {
 		if (WurmMapGen.config.markerType === 3) {
 			if (itemType === 'guardtower') { return WurmMapGen.markers.style3.guardtower; }
 			if (itemType === 'player') { return WurmMapGen.markers.style3.player; }
+			if (itemType === 'portal') { return WurmMapGen.markers.style3.portal; }
 
 			return L.divIcon({
 				className: 'icon-textlabel',
@@ -103,6 +104,7 @@ WurmMapGen.markers = {
 
 	// Simple icons to go with the text labels
 	style3: {
+		portal: new markerIcon({iconUrl: 'markers/v2-portal-icon.png'}),
 		player: new markerIcon({iconUrl: 'markers/v2-player-icon.png'}),
 		guardtower: new markerIcon({iconUrl: 'markers/v2-guardtower-icon.png'})
 	}
