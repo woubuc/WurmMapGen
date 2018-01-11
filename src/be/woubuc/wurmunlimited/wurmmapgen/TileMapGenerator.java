@@ -109,11 +109,34 @@ public class TileMapGenerator {
 		executor.shutdown();
 		
 		Object obj = new Object();
+		
+		int lineLength = 0;
+		long maxMemoryUsed = 0;
+		
 		while (!executor.isTerminated()) {
 			// Display progress
 			int percent = (int)((float)(totalProcesses - runningThreadsCount) / (float)(totalProcesses) * 100.0f);
 			
-			System.out.print((WurmMapGen.verbose ? "      -> " : "") + "Generating map tiles " + percent + "%\r");
+			clearLine(lineLength);
+			StringBuilder line = new StringBuilder();
+			if (WurmMapGen.verbose) line.append("      -> ");
+			line.append("Generating map tiles: ").append(percent).append("%");
+			
+			// In debug mode, also display memory use
+			if (WurmMapGen.debug) {
+				long totalMemory = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+				long freeMemory = Runtime.getRuntime().freeMemory() / 1024 / 1024;
+				long memoryUsed = totalMemory - freeMemory;
+				
+				if (memoryUsed > maxMemoryUsed) maxMemoryUsed = memoryUsed;
+				
+				line.append(" (memory: ")
+						.append(memoryUsed).append("mb used / ")
+						.append(freeMemory).append("mb free)     \r");
+			}
+			
+			lineLength = line.length();
+			System.out.print(line.toString());
 			
 			try {
 				synchronized (obj) {
@@ -122,7 +145,21 @@ public class TileMapGenerator {
 			} catch (InterruptedException ex) { }
 		}
 		
-		Logger.ok("Map tiles generated in " + (System.currentTimeMillis() - startTime) + "ms");
+		// Tile generation completed
+		StringBuilder line = new StringBuilder();
+		line.append("Generated ").append(tileCount).append(" map tiles in ")
+				.append(System.currentTimeMillis() - startTime).append("ms");
+		
+		if (WurmMapGen.debug) line.append(" (memory use max: ").append(maxMemoryUsed).append("mb)");
+		line.append("     ");
+		
+		Logger.ok(line.toString());
+	}
+	
+	private void clearLine(final int lineLength) {
+		for (int i = 0; i <= lineLength; i++) {
+			System.out.print("\b \b");
+		}
 	}
 	
 	/**
