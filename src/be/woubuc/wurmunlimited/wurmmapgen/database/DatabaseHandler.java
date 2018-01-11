@@ -144,9 +144,9 @@ public class DatabaseHandler {
 		
 		// Build query based on the number of tower IDs
 		StringBuilder query = new StringBuilder();
-		query.append("select `LASTOWNERID`, `POSX`, `POSY`, `QUALITYLEVEL`, `DAMAGE` from `ITEMS` where (");
+		query.append("select `LASTOWNERID`, `POSX`, `POSY`, `QUALITYLEVEL`, `DAMAGE` from `ITEMS` where ");
 		for (int i = 1; i < towerIds.size(); i++) query.append("`TEMPLATEID` = ? or ");
-		query.append("`TEMPLATEID` = ?) and `CREATIONSTATE` = 0;");
+		query.append("`TEMPLATEID` = ?;");
 		
 		ArrayList<GuardTower> guardTowers = new ArrayList<>();
 		try (PreparedStatement statement = items.prepareStatement(query.toString(), (Object[]) towerIds.toArray());
@@ -179,9 +179,9 @@ public class DatabaseHandler {
 		
 		// Build query based on the number of portal IDs
 		StringBuilder query = new StringBuilder();
-		query.append("select `NAME`, `POSX`, `POSY` from `ITEMS` where (");
+		query.append("select `NAME`, `POSX`, `POSY` from `ITEMS` where ");
 		for (int i = 1; i < portalIds.length; i++) query.append("`TEMPLATEID` = ? or ");
-		query.append("`TEMPLATEID` = ?) and `CREATIONSTATE` = 0;");
+		query.append("`TEMPLATEID` = ?;");
 		
 		ArrayList<Portal> portals = new ArrayList<>();
 		try (PreparedStatement statement = items.prepareStatement(query.toString(), (Object[]) portalIds);
