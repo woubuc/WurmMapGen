@@ -1,3 +1,8 @@
+WurmMapGen v2.3.3
+-----------------
+Fixed:   Issue with database queries where not all items were returned
+Added:   Show memory usage while generating map tiles in debug mode
+
 WurmMapGen v2.3.2
 -----------------
 Fixed:   Missing portal marker for markerType 3

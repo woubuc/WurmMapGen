@@ -23,7 +23,7 @@ public class WurmMapGen {
 	
 	public static void main(String[] args) throws Exception {
 		// Log intro
-		System.out.println("WurmMapGen v2.3.2");
+		System.out.println("WurmMapGen v2.3.3");
 		System.out.println("      Developed and maintained by woubuc");
 		System.out.println("      Based on original code by garrett94");
 		System.out.println("      More info: github.com/woubuc/WurmMapGen");
