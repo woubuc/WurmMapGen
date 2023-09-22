@@ -74,9 +74,14 @@ WurmMapGen.gui = new Vue({
 				for (i = 0; i < WurmMapGen.villages.length; i++) {
 					var village = WurmMapGen.villages[i];
 
+					// Fallback value if mayor name is null
+					if (village.mayor == null) {
+                 				village.mayor = "Unknown";
+                    			};
+
 					var name = escapeHtml(village.name);
 					var mayor = escapeHtml(village.mayor);
-
+					
 					var label = '';
 
 					// Check if name matches query
@@ -106,6 +111,11 @@ WurmMapGen.gui = new Vue({
 				for (i = 0; i < WurmMapGen.structures.length; i++) {
 					var structure = WurmMapGen.structures[i];
 
+					// Fallback value if creator name is null
+					if (structure.creator == null) {
+                 				structure.creator = "Unknown";
+                    			};
+					
 					var name = escapeHtml(structure.name);
 					var creator = escapeHtml(structure.creator);
 
@@ -157,6 +167,11 @@ WurmMapGen.gui = new Vue({
 				for (i = 0; i < WurmMapGen.guardtowers.length; i++) {
 					var tower = WurmMapGen.guardtowers[i];
 
+					// Fallback value if creator name is null
+					if (tower.creator == null) {
+                 				tower.creator = "Unknown";
+                    			};
+					
 					var creator = escapeHtml(tower.creator);
 
 					// Check if player name matches query
